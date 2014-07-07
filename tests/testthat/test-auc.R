@@ -1,0 +1,80 @@
+context("AUC")
+
+test_that("identity weights with no ties and perfect classification", {
+  y <- c(-1, -1, 1, 1)
+  w <- c(1, 1, 1, 1)
+  y.hat <- c(1, 2, 3, 4)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  expect_equal(tp.fp$TPR, c(1, 1, 1, 0.5, 0))
+  expect_equal(tp.fp$FPR, c(1, 0.5, 0, 0, 0))
+  auc <- WeightedAUC(tp.fp)
+  expect_equal(auc, 1)
+})
+
+test_that("identity weights with no ties and 1 bad error", {
+  y <- c(-1, -1, 1, 1)
+  w <- c(1, 1, 1, 1)
+  y.hat <- c(1, 2, 3, -1)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  expect_equal(tp.fp$TPR, c(1, 0.5, 0.5, 0.5, 0))
+  expect_equal(tp.fp$FPR, c(1, 1, 0.5, 0, 0))
+  auc <- WeightedAUC(tp.fp)
+  expect_equal(auc, 1/2)
+})
+
+test_that("identity weights with no ties and 1 not so bad error", {
+  y <- c(-1, -1, 1, 1)
+  w <- c(1, 1, 1, 1)
+  y.hat <- c(1, 2, 3, 1.5)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  expect_equal(tp.fp$TPR, c(1, 1, 0.5, 0.5, 0))
+  expect_equal(tp.fp$FPR, c(1, 0.5, 0.5, 0, 0))
+  auc <- WeightedAUC(tp.fp)
+  expect_equal(auc, 3/4)
+})
+
+test_that("identity weights with 1 tie", {
+  y <- c(-1, -1, 1, 1)
+  w <- c(1, 1, 1, 1)
+  y.hat <- c(1, 2, 3, 1)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  expect_equal(tp.fp$TPR, c(1, 0.5, 0.5, 0))
+  expect_equal(tp.fp$FPR, c(1, 0.5, 0, 0))
+  auc <- WeightedAUC(tp.fp)
+  expect_equal(auc, 5/8)
+})
+
+test_that("variable weights with 1 tie", {
+  y <- c(-1, -1, 1, 1)
+  w <- c(1, 1, 1, 9)
+  y.hat <- c(1, 2, 3, 1)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  expect_equal(tp.fp$TPR, c(1, 0.1, 0.1, 0))
+  expect_equal(tp.fp$FPR, c(1, 0.5, 0, 0))
+  auc <- WeightedAUC(tp.fp)
+  expect_equal(auc, 0.1 + 0.9*0.5/2)
+})
+
+test_that("variable weights with 2 ties", {
+  y <- c(-1, -1, 1, 1, 1)
+  w <- c(1, 1, 1, 4, 5)
+  y.hat <- c(1, 2, 3, 1, 1)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  expect_equal(tp.fp$TPR, c(1, 0.1, 0.1, 0))
+  expect_equal(tp.fp$FPR, c(1, 0.5, 0, 0))
+  auc <- WeightedAUC(tp.fp)
+  expect_equal(auc, 0.1 + 0.9*0.5/2)
+})
+
+test_that("ROCR.simple", {
+  library(ROCR)
+  data(ROCR.simple)
+  pred <- prediction( ROCR.simple$predictions, ROCR.simple$labels)
+  perf <- performance(pred,"tpr","fpr")
+  tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
+  expect_equal(tp.fp$TPR, rev(perf@y.values[[1]]))
+  expect_equal(tp.fp$FPR, rev(perf@x.values[[1]]))
+  ROCR.auc <- performance(pred, "auc")@y.values[[1]]
+  my.auc <- WeightedAUC(tp.fp)
+  expect_equal(ROCR.auc, my.auc)
+})
