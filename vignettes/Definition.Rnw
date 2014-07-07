@@ -1,4 +1,5 @@
 \documentclass{article}
+%\VignetteIndexEntry{Definition of the weighted ROC curve}
 \usepackage[cm]{fullpage}
 \usepackage{verbatim}
 \usepackage{hyperref} 
