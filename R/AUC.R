@@ -21,18 +21,34 @@ WeightedAUC <- structure(function
 ### Numeric scalar.
 }, ex=function(){
   library(ROCR)
+  library(pROC)
   library(microbenchmark)
-  ## For this un-weighted data set, verify that our AUC is the same as
-  ## that of ROCR.
+  ## For the un-weighted ROCR example data set, verify that our AUC is
+  ## the same as that of ROCR/pROC.
   data(ROCR.simple)
-  microbenchmark(ROCR={
-    pred <- with(ROCR.simple, prediction(predictions, labels))
-    rocr <- performance(pred, "auc")@y.values[[1]]
-  }, WeightedROC={
+  microbenchmark(WeightedROC={
     tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
     wroc <- WeightedAUC(tp.fp)
+  }, ROCR={
+    pred <- with(ROCR.simple, prediction(predictions, labels))
+    rocr <- performance(pred, "auc")@y.values[[1]]
+  }, pROC={
+    proc <- auc(labels ~ predictions, ROCR.simple)
   })
-  rbind(ROCR=rocr, WeightedROC=wroc)
+  rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc)
+  ## For the un-weighted pROC example data set, verify that our AUC is
+  ## the same as that of ROCR/pROC.
+  data(aSAH)
+  microbenchmark(WeightedROC={
+    tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
+    wroc <- WeightedAUC(tp.fp)
+  }, ROCR={
+    pred <- with(aSAH, prediction(s100b, outcome))
+    rocr <- performance(pred, "auc")@y.values[[1]]
+  }, pROC={
+    proc <- auc(outcome ~ s100b, aSAH)
+  })
+  rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc)
   ## Compute the AUC for this weighted data set.
   y <- c(-1, -1, 1, 1, 1)
   w <- c(1, 1, 1, 4, 5)

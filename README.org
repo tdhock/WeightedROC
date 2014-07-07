@@ -1,16 +1,15 @@
 Fast, weighted ROC curves
 
 Receiver Operating Characteristic (ROC) curve analysis is one way to
-evaluate an algorithm for binary classification. R package ROCR
-implements ROC curve computation and many other evaluation
-metrics. However, if the observations have weights then the ROCR
-package can not be used, as of ROCR version 1.0-5, published on CRAN
-2013-05-16.
+evaluate an algorithm for binary classification. R packages ROCR/pROC
+implement ROC curve computation. However, if the observations have
+weights then the ROCR/pROC packages can not be used, as of ROCR 1.0-5
+(2013-05-16) and pROC 1.7.9 (2014-06-12).
 
 The WeightedROC package implements ROC and Area Under the Curve (AUC)
-computation for weighted binary classification problems. Also,
-WeightedROC is 2-10x faster than ROCR for un-weighted problems (see
-examples below).
+computation for weighted binary classification problems. WeightedROC
+can also be used for un-weighted problems, and it is 2-10x faster than
+ROCR/pROC (see examples below).
 
 #+BEGIN_SRC R
 install.packages("devtools")
@@ -19,3 +18,15 @@ library(WeightedROC)
 example(WeightedROC)
 example(WeightedAUC)
 #+END_SRC
+
+** When should I use ROCR?
+
+If you want to compute many other evaluation metrics
+(e.g. precision/recall) then you should use the ROCR package, since
+WeightedROC can only compute ROC/AUC.
+
+** When should I use pROC?
+
+If you want to compute the partial AUC and compare curves using
+statistical tests then you should use the pROC package, since
+WeightedROC does not implement these features.

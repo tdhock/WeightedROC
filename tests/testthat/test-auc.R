@@ -78,3 +78,14 @@ test_that("ROCR.simple", {
   my.auc <- WeightedAUC(tp.fp)
   expect_equal(ROCR.auc, my.auc)
 })
+
+test_that("aSAH", {
+  library(pROC)
+  data(aSAH)
+  proc <- roc(outcome ~ s100b, aSAH)
+  tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
+  expect_equal(tp.fp$FPR, 1-proc$specificities)
+  expect_equal(tp.fp$TPR, proc$sensitivities)
+  my.auc <- WeightedAUC(tp.fp)
+  expect_equal(my.auc, as.numeric(proc$auc))
+})
