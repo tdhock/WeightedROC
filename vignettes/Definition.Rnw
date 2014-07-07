@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage[cm]{fullpage}
+\usepackage{verbatim}
+\usepackage{hyperref} 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{amsmath,amssymb}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\Diag}{Diag}
+\DeclareMathOperator*{\TPR}{TPR}
+\DeclareMathOperator*{\FPR}{FPR}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
+\newcommand{\RR}{\mathbb R}
+
+\begin{document}
+
+\title{Weighted ROC analysis}
+\author{Toby Dylan Hocking}
+\maketitle
+
+\section{Introduction}
+
+In binary classification, we are given $n$ observations. For each
+observation $i\in \{1, \dots, n\}$ we have an input/feature
+$x_i\in\mathcal X$ and output/label $y_i\in\{-1, 1\}$. For example,
+say that $\mathcal X$ is the space of all photographs, and we want to
+find a binary classifier that predicts whether a particular photograph
+$x_i$ contains a car ($y_i=1$) or does not contain a car ($y_i=-1$).
+
+In weighted binary classification we also have observation-specific
+weights $w_i\in\RR_+$ which are the cost of making an error in predicting that
+observation. Thus the goal is to find a classifier $c:\mathcal X
+\rightarrow \{-1, 1\}$ that minimizes the weighted zero-one loss on a
+set of test data
+\begin{equation}
+  \minimize_c \sum_{i\in\text{test}}
+  I\left[ c(x_i) \neq y_i \right] w_i,
+\end{equation}
+where $I$ is the indicator function that is 0 for a correct
+prediction, and 1 otherwise.
+
+Instead of directly learning a classification function $c$, binary
+classifiers often instead learn a score function $f:\mathcal
+X\rightarrow \RR$. Large values are more likely to be positive $y_i=1$
+and small values are more likely to be negative. One way of evaluating
+such a model is by using the weighted Receiver Operating
+Characteristic (ROC) curve, as explained in the next section.
+
+\section{Weighted ROC curve}
+
+Let $\hat y_i=f(x_i)\in\RR$ be the predicted score for each
+observation $i\in\{1, \dots, n\}$, let $\mathcal I_1=\{i:y_i=1\}$ be
+the set of positive examples and let $\mathcal I_{-1}=\{i:y_i=-1\}$ be
+the set of negative examples. Then the total positive weight is
+$W_1=\sum_{i\in\mathcal I_1} w_i$ and the total negative weight is
+$W_{-1} = \sum_{i\in\mathcal I_{-1}} w_i$.
+
+For any threshold $\tau\in\RR$, define the thresholding function
+$t_\tau:\RR\rightarrow\{-1, 1\}$ as
+\begin{equation}
+  \label{eq:t_tau}
+  t_\tau(\hat y) =
+  \begin{cases}
+    1 & \text{ if } \hat y \geq \tau \\
+    -1 & \text{ if } \hat y < \tau.
+  \end{cases}
+\end{equation}
+
+We define the weighted false
+positive rate as
+\begin{equation}
+  \label{eq:weighted_FPR}
+  \FPR(\tau) =
+  \frac{1}{W_{-1}}
+  \sum_{i\in\mathcal I_{-1}}
+  I\left[
+    t_\tau(\hat y_i) \neq -1
+  \right]
+  w_i
+\end{equation}
+and the weighted true positive rate as
+\begin{equation}
+  \label{eq:weighted_FPR}
+  \TPR(\tau) =
+  \frac{1}{W_{1}}
+  \sum_{i\in\mathcal I_{1}}
+  I\left[
+    t_\tau(\hat y_i) \neq 1
+  \right]
+  w_i.
+\end{equation}
+A weighted ROC curve is drawn by plotting $\FPR(\tau)$ and
+$\TPR(\tau)$ for all thresholds $\tau\in\RR$. 
+It can be computed and plotted using the R code
+
+<<curve, fig=TRUE>>=
+y <- c(-1, -1, 1, 1, 1)
+w <- c(1, 1, 1, 4, 5)
+y.hat <- c(1, 2, 3, 1, 1)
+library(WeightedROC)
+tp.fp <- WeightedROC(y.hat, y, w)
+library(ggplot2)
+ggplot()+
+  geom_path(aes(FPR, TPR), data=tp.fp)+
+  coord_equal()
+@ 
+
+\section{Weighted AUC}
+
+The Area Under the Curve (AUC) may be computed using the R code
+
+<<auc>>=
+WeightedAUC(tp.fp)
+@ 
+
+
+\end{document}
