@@ -81,6 +81,7 @@ WeightedROC <- structure(function
               data=roc.curves, size=1)+
     coord_equal()
   ## Compare speed and plot ROC curves for the pROC example data set.
+  data(aSAH)
   microbenchmark(WeightedROC={
     tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
   }, ROCR={
