@@ -19,6 +19,12 @@ example(WeightedROC)
 example(WeightedAUC)
 #+END_SRC
 
+** What is the mathematical definition of the weighted ROC curve?
+
+#+BEGIN_SRC R
+vignette("Definition", "WeightedROC")
+#+END_SRC
+
 ** When should I use ROCR?
 
 If you want to compute many other evaluation metrics
