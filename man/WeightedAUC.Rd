@@ -18,6 +18,8 @@
 \examples{
 library(ROCR)
 library(microbenchmark)
+## For this un-weighted data set, verify that our AUC is the same as
+## that of ROCR.
 data(ROCR.simple)
 microbenchmark(ROCR={
   pred <- with(ROCR.simple, prediction(predictions, labels))
@@ -27,4 +29,10 @@ microbenchmark(ROCR={
   wroc <- WeightedAUC(tp.fp)
 })
 rbind(ROCR=rocr, WeightedROC=wroc)
+## Compute the AUC for this weighted data set.
+y <- c(-1, -1, 1, 1, 1)
+w <- c(1, 1, 1, 4, 5)
+y.hat <- c(1, 2, 3, 1, 1)
+tp.fp <- WeightedROC(y.hat, y, w)
+WeightedAUC(tp.fp)
 }

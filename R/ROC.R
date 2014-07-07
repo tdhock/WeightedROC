@@ -87,5 +87,6 @@ WeightedROC <- structure(function
   y.hat <- c(1, 2, 3, 1, 1)
   tp.fp <- WeightedROC(y.hat, y, w)
   ggplot()+
-    geom_path(aes(FPR, TPR), data=tp.fp)
+    geom_path(aes(FPR, TPR), data=tp.fp)+
+    coord_equal()
 })
