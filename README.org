@@ -12,7 +12,7 @@ can also be used for un-weighted problems, and it is 2-10x faster than
 ROCR/pROC (see examples below).
 
 #+BEGIN_SRC R
-install.packages("devtools")
+install.packages(c("devtools", "ROCR", "microbenchmark", "pROC"))
 devtools::install_github("tdhock/WeightedROC")
 library(WeightedROC)
 example(WeightedROC)
