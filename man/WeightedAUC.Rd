@@ -16,6 +16,13 @@
 
 
 \examples{
+## Compute the AUC for this weighted data set.
+y <- c(-1, -1, 1, 1, 1)
+w <- c(1, 1, 1, 4, 5)
+y.hat <- c(1, 2, 3, 1, 1)
+tp.fp <- WeightedROC(y.hat, y, w)
+WeightedAUC(tp.fp)
+
 library(ROCR)
 library(pROC)
 library(microbenchmark)
@@ -45,10 +52,4 @@ microbenchmark(WeightedROC={
   proc <- auc(outcome ~ s100b, aSAH)
 })
 rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc)
-## Compute the AUC for this weighted data set.
-y <- c(-1, -1, 1, 1, 1)
-w <- c(1, 1, 1, 4, 5)
-y.hat <- c(1, 2, 3, 1, 1)
-tp.fp <- WeightedROC(y.hat, y, w)
-WeightedAUC(tp.fp)
 }

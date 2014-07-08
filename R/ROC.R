@@ -50,6 +50,17 @@ WeightedROC <- structure(function
 ### data.frame with the true positive rate (TPR) and false positive
 ### rate (FPR).
 }, ex=function(){
+  ## WeightedROC can compute ROC curves for data sets with variable
+  ## weights.
+  y <- c(-1, -1, 1, 1, 1)
+  w <- c(1, 1, 1, 4, 5)
+  y.hat <- c(1, 2, 3, 1, 1)
+  tp.fp <- WeightedROC(y.hat, y, w)
+  library(ggplot2)
+  ggplot()+
+    geom_path(aes(FPR, TPR), data=tp.fp)+
+    coord_equal()
+
   library(ROCR)
   library(pROC)
   library(microbenchmark)
@@ -75,7 +86,6 @@ WeightedROC <- structure(function
   }
   roc.curves <- rbind(data.frame(tp.fp, package="WeightedROC"),
                       perfDF(perf), procDF(proc))
-  library(ggplot2)
   ggplot()+
     geom_path(aes(FPR, TPR, color=package, linetype=package),
               data=roc.curves, size=1)+
@@ -120,14 +130,5 @@ WeightedROC <- structure(function
   ggplot()+
     geom_path(aes(FPR, TPR, color=package, linetype=package),
               data=roc.curves, size=1)+
-    coord_equal()
-  ## WeightedROC can compute ROC curves for data sets with variable
-  ## weights.
-  y <- c(-1, -1, 1, 1, 1)
-  w <- c(1, 1, 1, 4, 5)
-  y.hat <- c(1, 2, 3, 1, 1)
-  tp.fp <- WeightedROC(y.hat, y, w)
-  ggplot()+
-    geom_path(aes(FPR, TPR), data=tp.fp)+
     coord_equal()
 })
