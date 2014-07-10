@@ -36,3 +36,13 @@ WeightedROC can only compute ROC/AUC.
 If you want to compute the partial AUC and compare curves using
 statistical tests then you should use the pROC package, since
 WeightedROC does not implement these features.
+** When should I use glmnet?
+
+The glmnet package includes an =auc= function for computing AUC, but
+does not include a function for computing the ROC curve. So it
+actually computes the AUC faster than WeightedROC, for both equal or
+unequal weights. WARNING: as of glmnet 1.9-5 (2013-8-1), it returns
+the incorrect AUC when there are ties in the predicted scores, see
+=example(WeightedAUC)=. Conclusion: if your scores have no ties, and
+you only want the AUC (not the ROC curve), then glmnet::auc will
+compute the AUC very fast.
