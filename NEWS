@@ -2,6 +2,8 @@
 
 Compare with glmnet::auc.
 
+Speed vignette.
+
 2014.7.7
 
 First version with examples and tests copied from ChIP-seq data

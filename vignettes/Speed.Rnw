@@ -1,0 +1,168 @@
+\documentclass{article}
+%\VignetteIndexEntry{Un-weighted ROC curve speed comparison}
+\usepackage[cm]{fullpage}
+\usepackage{verbatim}
+\usepackage{hyperref} 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{amsmath,amssymb}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\Diag}{Diag}
+\DeclareMathOperator*{\TPR}{TPR}
+\DeclareMathOperator*{\FPR}{FPR}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
+\newcommand{\RR}{\mathbb R}
+
+\begin{document}
+
+\title{Comparing speed of packages for computing ROC curves}
+\author{Toby Dylan Hocking}
+\maketitle
+
+\section{Introduction}
+
+The goal of this vignette is to compare how long it takes to compute
+the ROC curves and AUC using different R packages: WeightedROC, ROCR,
+pROC, glmnet.
+
+\section{Data}
+
+The data set I will analyze is the \verb|spam| data set discussed in
+the book ``The Elements of Statistical Learning'' by Hastie,
+Tibshirani, and Friedman. The book is available to read for free as a
+downloadable PDF at
+
+\url{http://statweb.stanford.edu/~tibs/ElemStatLearn/}
+
+The data set is available in the R package ElemStatLearn:
+
+<<data>>=
+library(ElemStatLearn)
+data(spam)
+is.label <- names(spam) == "spam"
+X <- as.matrix(spam[,!is.label])
+y <- spam[,is.label]
+set.seed(1)
+train.i <- sample(nrow(spam), nrow(spam)/2)
+sets <- 
+  list(train=list(features=X[train.i, ], label=y[train.i]),
+       test=list(features=X[-train.i, ], label=y[-train.i]))
+str(sets)
+@ 
+
+I divided the data set into half train, half test. I will fit a model
+on the training set and see if it works on the test set.
+
+\section{Model fitting}
+
+Below, I fit an L1-regularized logistic regression model to the spam
+training set.
+
+<<model>>=
+library(glmnet)
+system.time({
+  fit <- cv.glmnet(sets$train$features, sets$train$label, family="binomial")
+})
+@ 
+
+On my Intel i7 2.8GHz CPU, it took about 10 seconds to fit the model.
+
+\section{Timing test ROC curve computation}
+
+ROC analysis is useful for evaluating binary classifiers. Below we
+compute the ROC curves using WeightedROC, pROC, and ROCR.
+
+<<test-ROC-time>>=
+library(WeightedROC)
+library(ROCR)
+library(pROC)
+library(microbenchmark)
+set <- sets$test
+guess <- predict(fit, set$features)
+microbenchmark(WeightedROC={
+  wroc <- WeightedROC(guess, set$label)
+}, ROCR={
+  pred <- prediction(guess, set$label)
+  perf <- performance(pred, "tpr", "fpr")
+}, pROC={
+  proc <- roc(set$label, guess, algorithm=2)
+})
+
+@ 
+
+It is clear that WeightedROC is the fastest computation (on my
+computer, median 1.8 milliseconds), followed by ROCR (7.2
+milliseconds), and finally pROC (26.4 milliseconds). However, all of
+the ROC computations are much faster than the model fitting (10
+seconds). Below, we plot the ROC curves.
+
+<<test-ROC-curves, fig=TRUE>>=
+perfDF <- function(p){
+  data.frame(FPR=p@x.values[[1]], TPR=p@y.values[[1]], package="ROCR")
+}
+procDF <- function(p){
+  data.frame(FPR=1-p$specificities, TPR=p$sensitivities, package="pROC")
+}
+roc.curves <- rbind(data.frame(wroc, package="WeightedROC"),
+                    perfDF(perf), procDF(proc))
+library(ggplot2)
+rocPlot <- ggplot()+
+  geom_path(aes(FPR, TPR, color=package, linetype=package),
+            data=roc.curves, size=1)+
+  coord_equal()
+print(rocPlot)
+
+@ 
+
+\section{Scaling}
+
+In this section I was interested in seeing if there are any
+differences between algorithms as the number of data points
+changes. 
+
+<<scaling, fig=TRUE>>=
+all.sizes <- NULL
+for(size in c(400, 800, 1200, 1500, 2000, 2300)){
+  indices <- seq(1, length(set$label), l=size)
+  y <- set$label[indices]
+  y.hat <- guess[indices]
+  this.size <- microbenchmark(WeightedROC={
+    wroc <- WeightedROC(y.hat, y)
+  }, ROCR={
+    pred <- prediction(y.hat, y)
+    perf <- performance(pred, "tpr", "fpr")
+  }, pROC.1={
+    proc <- roc(y, y.hat, algorithm=1)
+  }, pROC.2={
+    proc <- roc(y, y.hat, algorithm=2)
+  })
+  all.sizes <- rbind(all.sizes, data.frame(this.size, size))
+}
+library(dplyr)
+ms <- all.sizes %.% 
+  mutate(milliseconds=time/1e6)
+algo.stats <- ms %.%
+  group_by(expr, size) %.%
+  summarise(mean=mean(milliseconds),
+            sd=sd(milliseconds))
+timePlot <- ggplot()+
+  geom_ribbon(aes(size, ymin=mean-sd, ymax=mean+sd, fill=expr), 
+              data=algo.stats, alpha=1/2)+
+  geom_line(aes(size, mean, color=expr), data=algo.stats, size=2)+
+  geom_point(aes(size, milliseconds, color=expr), data=ms, pch=1)+
+  ylab("milliseconds")+
+  xlab("data set size")+
+  ggtitle("mean +/- 1 standard deviation")
+print(timePlot)
+
+@ 
+
+The figure above shows that for the spam data, the data set size does
+not affect the speed ordering of the algorithms for ROC curve
+computation. In all cases, WeightedROC is fastest, followed by ROCR,
+then pROC.2, then pROC.1. It makes sense that pROC.2 is faster than
+pROC.1, since pROC.2 uses the cumsum function, but pROC.1 does not.
+
+\end{document}

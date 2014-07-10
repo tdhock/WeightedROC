@@ -8,4 +8,7 @@ Description: Fast computation of
  Receiver Operating Characteristic (ROC) curves
  and Area Under the Curve (AUC)
  for weighted binary classification problems.
-Suggests: ROCR, ggplot2, microbenchmark, testthat, pROC, glmnet, ElemStatLearn
+Suggests: ROCR, pROC, 
+	  microbenchmark,    
+	  glmnet, ElemStatLearn,
+	  testthat, dplyr, ggplot2
