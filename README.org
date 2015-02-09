@@ -1,15 +1,12 @@
 Fast, weighted ROC curves
 
 Receiver Operating Characteristic (ROC) curve analysis is one way to
-evaluate an algorithm for binary classification. R packages ROCR/pROC
-implement ROC curve computation. However, if the observations have
-weights then the ROCR/pROC packages can not be used, as of ROCR 1.0-5
-(2013-05-16) and pROC 1.7.9 (2014-06-12).
-
-The WeightedROC package implements ROC and Area Under the Curve (AUC)
-computation for weighted binary classification problems. WeightedROC
-can also be used for un-weighted problems, and it is 2-10x faster than
-ROCR/pROC (see examples below).
+evaluate an algorithm for binary classification. R packages
+ROCR/pROC/AUC/PerfMeas/PRROC implement ROC curve computation. However,
+if the observations have weights (non-uniform loss for each
+observation) then the these packages can not be used. The WeightedROC
+package implements ROC and Area Under the Curve (AUC) computation for
+weighted binary classification problems.
 
 #+BEGIN_SRC R
 install.packages("devtools")
@@ -19,24 +16,55 @@ example(WeightedROC)
 example(WeightedAUC)
 #+END_SRC
 
+| Package     |   version |       date | lines of R code | weights | tests | cumsum |
+|-------------+-----------+------------+-----------------+---------+-------+--------|
+| pROC        |     1.7.9 | 2014-06-12 |            5666 | no      | no    | yes    |
+| ROCR        |     1.0-5 | 2013-05-16 |            1650 | no      | no    | yes    |
+| PRROC       |       1.0 | 2014-12-16 |             723 | no      | no    | no     |
+| PerfMeas    |     1.2.1 | 2014-09-07 |             684 | no      | no    | no     |
+| AUC         |     0.3.0 | 2013-09-30 |             354 | no      | no    | no     |
+| WeightedROC | 2014.7.10 | 2014-07-10 |             294 | yes     | yes   | yes    |
+| glmnet::auc |     1.9-5 | 2013-08-01 |              22 | yes     | no    | yes    |
+
+- *weights* shows which packages allow weights (non-uniform loss for each observation).
+- *tests* shows which R packages implement [[file:tests/testthat/test-auc.R][unit tests]] to check that the
+  ROC/AUC is computed correctly. Note that WeightedROC is the only package
+  that has unit tests.
+- *lines of R code* shows how many lines of code were used in the pkg/R/* files.
+  Note that WeightedROC has the simplest implementation other than glmnet::auc.
+- *cumsum* shows whether or not the cumsum function is used to compute
+  the ROC curve. Using the cumsum function is simple to code and fast
+  -- see the [[file:vignettes/Speed.Rnw][Speed vignette]].
+
 ** What is the mathematical definition of the weighted ROC curve?
 
 #+BEGIN_SRC R
 vignette("Definition", "WeightedROC")
 #+END_SRC
 
-** When should I use ROCR?
+** When to use PRROC? 
 
-If you want to compute many other evaluation metrics
-(e.g. precision/recall) then you should use the ROCR package, since
-WeightedROC can only compute ROC/AUC.
+For "soft" real-valued labels (not "hard" labels $\in \{-1, 1\}$), and
+ [[http://dl.acm.org/citation.cfm?id%3D1143874][accurate interpolation]] of Precision-Recall curves, use PRROC.
 
-** When should I use pROC?
+Note that the meaning of the word "Weighted" in WeightedROC is not the
+same as in the title of package PRROC: "Precision-Recall and ROC
+Curves for Weighted and Unweighted Data." In WeightedROC, each
+observation $i$ has a "hard" label $y_i \in\{-1, 1\}$ and a weight
+$w_i\in R_+$ which determines how much it contributes to the loss
+function. In PRROC, each observation contributes an equal amount
+$w_i=1$ to the loss function, and labels can be soft $y_i\in R$.
 
-If you want to compute the partial AUC and compare curves using
-statistical tests then you should use the pROC package, since
-WeightedROC does not implement these features.
-** When should I use glmnet?
+** When to use ROCR?
+
+To compute other evaluation metrics (e.g. lift) use the ROCR package.
+
+** When to use pROC?
+
+To compute the partial AUC and compare curves using statistical tests
+use the pROC package.
+
+** When to use glmnet?
 
 The glmnet package includes an =auc= function for computing AUC, but
 does not include a function for computing the ROC curve. So it
