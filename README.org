@@ -20,7 +20,7 @@ example(WeightedAUC)
 |-------------+-----------+------------+-----------------+---------+-------+--------|
 | pROC        |     1.7.9 | 2014-06-12 |            5666 | no      | no    | *yes*  |
 | ROCR        |     1.0-5 | 2013-05-16 |            1650 | no      | no    | *yes*  |
-| PRROC       |       1.0 | 2014-12-16 |             723 | no      | no    | no     |
+| PRROC       |       1.0 | 2014-12-16 |             723 | *yes*   | no    | no     |
 | PerfMeas    |     1.2.1 | 2014-09-07 |             684 | no      | no    | no     |
 | AUC         |     0.3.0 | 2013-09-30 |             354 | no      | no    | no     |
 | WeightedROC | 2014.7.10 | 2014-07-10 |             294 | *yes*   | *yes* | *yes*  |
@@ -52,14 +52,6 @@ vignette("Definition", "WeightedROC")
 
 For "soft" real-valued labels (not "hard" labels $\in \{-1, 1\}$), and
  [[https://www.biostat.wisc.edu/~page/rocpr.pdf][accurate interpolation]] of Precision-Recall curves, use PRROC.
-
-Note that the meaning of the word "Weighted" in WeightedROC is not the
-same as in the title of package PRROC: "Precision-Recall and ROC
-Curves for Weighted and Unweighted Data." In WeightedROC, each
-observation $i$ has a "hard" label $y_i \in\{-1, 1\}$ and a weight
-$w_i\in R_+$ which determines how much it contributes to the loss
-function. In PRROC, each observation contributes an equal amount
-$w_i=1$ to the loss function, and labels can be soft $y_i\in R$.
 
 ** When to use ROCR?
 
