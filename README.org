@@ -3,10 +3,10 @@ Fast, weighted ROC curves
 Receiver Operating Characteristic (ROC) curve analysis is one way to
 evaluate an algorithm for binary classification. R packages
 ROCR/pROC/AUC/PerfMeas/PRROC implement ROC curve computation. However,
-if the observations have weights (non-uniform loss for each
-observation) then the these packages can not be used. The WeightedROC
-package implements ROC and Area Under the Curve (AUC) computation for
-weighted binary classification problems.
+if the observations have weights (non-uniform loss) then these
+packages can not be used. The WeightedROC package implements ROC and
+Area Under the Curve (AUC) computation for weighted binary
+classification problems.
 
 #+BEGIN_SRC R
 install.packages("devtools")
@@ -18,13 +18,13 @@ example(WeightedAUC)
 
 | Package     |   version |       date | lines of R code | weights | tests | cumsum |
 |-------------+-----------+------------+-----------------+---------+-------+--------|
-| pROC        |     1.7.9 | 2014-06-12 |            5666 | no      | no    | yes    |
-| ROCR        |     1.0-5 | 2013-05-16 |            1650 | no      | no    | yes    |
+| pROC        |     1.7.9 | 2014-06-12 |            5666 | no      | no    | *yes*  |
+| ROCR        |     1.0-5 | 2013-05-16 |            1650 | no      | no    | *yes*  |
 | PRROC       |       1.0 | 2014-12-16 |             723 | no      | no    | no     |
 | PerfMeas    |     1.2.1 | 2014-09-07 |             684 | no      | no    | no     |
 | AUC         |     0.3.0 | 2013-09-30 |             354 | no      | no    | no     |
-| WeightedROC | 2014.7.10 | 2014-07-10 |             294 | yes     | yes   | yes    |
-| glmnet::auc |     1.9-5 | 2013-08-01 |              22 | yes     | no    | yes    |
+| WeightedROC | 2014.7.10 | 2014-07-10 |             294 | *yes*   | *yes* | *yes*  |
+| glmnet::auc |     1.9-5 | 2013-08-01 |              22 | *yes*   | no    | *yes*  |
 
 - *weights* shows which packages allow weights (non-uniform loss for each observation).
 - *tests* shows which R packages implement [[file:tests/testthat/test-auc.R][unit tests]] to check that the
@@ -45,7 +45,7 @@ vignette("Definition", "WeightedROC")
 ** When to use PRROC? 
 
 For "soft" real-valued labels (not "hard" labels $\in \{-1, 1\}$), and
- [[http://dl.acm.org/citation.cfm?id%3D1143874][accurate interpolation]] of Precision-Recall curves, use PRROC.
+ [[https://www.biostat.wisc.edu/~page/rocpr.pdf][accurate interpolation]] of Precision-Recall curves, use PRROC.
 
 Note that the meaning of the word "Weighted" in WeightedROC is not the
 same as in the title of package PRROC: "Precision-Recall and ROC
@@ -57,12 +57,14 @@ $w_i=1$ to the loss function, and labels can be soft $y_i\in R$.
 
 ** When to use ROCR?
 
-To compute other evaluation metrics (e.g. lift) use the ROCR package.
+To compute other evaluation metrics (e.g. lift) use the ROCR
+package. WeightedROC does not implement evaluation metric other than
+ROC/AUC.
 
 ** When to use pROC?
 
 To compute the partial AUC and compare curves using statistical tests
-use the pROC package.
+use the pROC package. WeightedROC does not implement these features.
 
 ** When to use glmnet?
 
