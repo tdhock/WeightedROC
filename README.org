@@ -34,9 +34,15 @@ example(WeightedAUC)
   Note that WeightedROC has the simplest implementation other than glmnet::auc.
 - *cumsum* shows whether or not the cumsum function is used to compute
   the ROC curve. Using the cumsum function is simple to code and fast
-  -- see the [[file:vignettes/Speed.Rnw][Speed vignette]].
+  -- see the [[file:vignettes/Speed.Rnw][Speed vignette]],
+
+#+BEGIN_SRC R
+vignette("Speed", "WeightedROC")
+#+END_SRC
 
 ** What is the mathematical definition of the weighted ROC curve?
+
+See the [[file:vignettes/Definition.Rnw][Definition vignette]],
 
 #+BEGIN_SRC R
 vignette("Definition", "WeightedROC")
@@ -58,7 +64,7 @@ $w_i=1$ to the loss function, and labels can be soft $y_i\in R$.
 ** When to use ROCR?
 
 To compute other evaluation metrics (e.g. lift) use the ROCR
-package. WeightedROC does not implement evaluation metric other than
+package. WeightedROC does not implement evaluation metrics other than
 ROC/AUC.
 
 ** When to use pROC?
