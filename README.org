@@ -20,7 +20,7 @@ example(WeightedAUC)
 |-------------+-----------+------------+-----------------+---------+-------+--------|
 | pROC        |     1.7.9 | 2014-06-12 |            5666 | no      | no    | *yes*  |
 | ROCR        |     1.0-5 | 2013-05-16 |            1650 | no      | no    | *yes*  |
-| PRROC       |       1.0 | 2014-12-16 |             723 | *yes*   | no    | no     |
+| PRROC       |       1.1 | 2015-02-23 |             716 | *yes*   | *yes* | no     |
 | PerfMeas    |     1.2.1 | 2014-09-07 |             684 | no      | no    | no     |
 | AUC         |     0.3.0 | 2013-09-30 |             354 | no      | no    | no     |
 | WeightedROC | 2014.7.10 | 2014-07-10 |             294 | *yes*   | *yes* | *yes*  |
@@ -28,8 +28,7 @@ example(WeightedAUC)
 
 - *weights* shows which packages allow weights (non-uniform loss for each observation).
 - *tests* shows which R packages implement [[file:tests/testthat/test-auc.R][unit tests]] to check that the
-  ROC/AUC is computed correctly. Note that WeightedROC is the only package
-  that has unit tests.
+  ROC/AUC is computed correctly.
 - *lines of R code* shows how many lines of code were used in the pkg/R/* files.
   Note that WeightedROC has the simplest implementation other than glmnet::auc.
 - *cumsum* shows whether or not the cumsum function is used to compute
