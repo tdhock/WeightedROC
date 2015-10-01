@@ -43,12 +43,13 @@ WeightedROC <- structure(function
   cum.negative <- cumsum(w.negative)
   is.end <- c(diff(y.hat) != 0, TRUE)
   n <- length(y)
+  threshold <- c(y.hat[is.end], Inf)
   TPR <- c(1, 1-cum.positive[is.end]/cum.positive[n])
   FPR <- c(1, 1-cum.negative[is.end]/cum.negative[n])
-  d <- data.frame(TPR, FPR)
+  d <- data.frame(TPR, FPR, threshold)
   d
-### data.frame with the true positive rate (TPR) and false positive
-### rate (FPR).
+### data.frame with true positive rate (TPR), false positive rate
+### (FPR), and threshold (smallest guess classified as positive).
 }, ex=function(){
   ## WeightedROC can compute ROC curves for data sets with variable
   ## weights.
