@@ -1,5 +1,7 @@
 Fast, weighted ROC curves
 
+[[https://travis-ci.org/tdhock/WeightedROC][https://travis-ci.org/tdhock/WeightedROC.png?branch=master]]
+
 Receiver Operating Characteristic (ROC) curve analysis is one way to
 evaluate an algorithm for binary classification. R packages
 ROCR/pROC/AUC/PerfMeas/PRROC implement ROC curve computation. However,
