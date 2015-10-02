@@ -20,7 +20,7 @@ test_that("identity weights with no ties and 1 bad error", {
   y.hat <- c(1, 2, 3, -1)
   tp.fp <- WeightedROC(y.hat, y, w)
   expect_equal(tp.fp$TPR, c(1, 0.5, 0.5, 0.5, 0))
-  expect_equal(tp.fp$FN, c(0, 0, 1, 2, 2))
+  expect_equal(tp.fp$FN, c(0, 1, 1, 1, 2))
   expect_equal(tp.fp$FPR, c(1, 1, 0.5, 0, 0))
   expect_equal(tp.fp$FP, c(2, 2, 1, 0, 0))
   expect_equal(tp.fp$threshold, c(-1, 1, 2, 3, Inf))
