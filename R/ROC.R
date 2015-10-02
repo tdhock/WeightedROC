@@ -44,9 +44,15 @@ WeightedROC <- structure(function
   is.end <- c(diff(y.hat) != 0, TRUE)
   n <- length(y)
   threshold <- c(y.hat[is.end], Inf)
-  TPR <- c(1, 1-cum.positive[is.end]/cum.positive[n])
-  FPR <- c(1, 1-cum.negative[is.end]/cum.negative[n])
-  d <- data.frame(TPR, FPR, threshold)
+  total.positive <- cum.positive[n]
+  total.negative <- cum.negative[n]
+  FN <- c(0, cum.positive[is.end])
+  FNR <- FN/total.positive
+  TPR <- 1-FNR
+  TN <- c(0, cum.negative[is.end])
+  FP <- total.negative - TN
+  FPR <- FP/total.negative
+  d <- data.frame(TPR, FPR, threshold, FN, FP)
   d
 ### data.frame with true positive rate (TPR), false positive rate
 ### (FPR), and threshold (smallest guess classified as positive).
