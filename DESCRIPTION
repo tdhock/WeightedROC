@@ -1,7 +1,7 @@
 Package: WeightedROC
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
 Author: Toby Dylan Hocking
-Version: 2014.7.10
+Version: 2015.10.02
 License: GPL-3
 Title: Fast, weighted ROC curves
 Description: Fast computation of
@@ -11,4 +11,4 @@ Description: Fast computation of
 Suggests: ROCR, pROC, 
 	  microbenchmark,    
 	  glmnet, ElemStatLearn,
-	  testthat, dplyr, ggplot2
+	  testthat, ggplot2
