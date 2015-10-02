@@ -105,8 +105,9 @@ perfDF <- function(p){
 procDF <- function(p){
   data.frame(FPR=1-p$specificities, TPR=p$sensitivities, package="pROC")
 }
-roc.curves <- rbind(data.frame(wroc, package="WeightedROC"),
-                    perfDF(perf), procDF(proc))
+roc.curves <- 
+  rbind(data.frame(wroc[,c("FPR", "TPR")], package="WeightedROC"),
+        perfDF(perf), procDF(proc))
 library(ggplot2)
 rocPlot <- ggplot()+
   geom_path(aes(FPR, TPR, color=package, linetype=package),
@@ -123,7 +124,8 @@ differences between algorithms as the number of data points
 changes. 
 
 <<scaling, fig=TRUE>>=
-all.sizes <- NULL
+stats.by.size.expr <- list()
+ms.by.size <- list()
 for(size in c(400, 800, 1200, 1500, 2000, 2300)){
   indices <- seq(1, length(set$label), l=size)
   y <- set$label[indices]
@@ -138,19 +140,24 @@ for(size in c(400, 800, 1200, 1500, 2000, 2300)){
   }, pROC.2={
     proc <- roc(y, y.hat, algorithm=2)
   })
-  all.sizes <- rbind(all.sizes, data.frame(this.size, size))
+  this.size$milliseconds <- this.size$time/1e6
+  ms.by.size[[paste(size)]] <- data.frame(size, this.size)
+  this.by.expr <- split(this.size, this.size$expr)
+  for(expr in names(this.by.expr)){
+    stats <- with(this.by.expr[[expr]], {
+      data.frame(median=median(milliseconds),
+                 q25=quantile(milliseconds, 0.25),
+                 q75=quantile(milliseconds, 0.75))
+    })
+    stats.by.size.expr[[paste(size, expr)]] <- data.frame(size, expr, stats)
+  }
 }
-library(dplyr)
-ms <- all.sizes %.% 
-  mutate(milliseconds=time/1e6)
-algo.stats <- ms %.%
-  group_by(expr, size) %.%
-  summarise(mean=mean(milliseconds),
-            sd=sd(milliseconds))
+ms <- do.call(rbind, ms.by.size)
+algo.stats <- do.call(rbind, stats.by.size.expr)
 timePlot <- ggplot()+
-  geom_ribbon(aes(size, ymin=mean-sd, ymax=mean+sd, fill=expr), 
+  geom_ribbon(aes(size, ymin=q25, ymax=q75, fill=expr), 
               data=algo.stats, alpha=1/2)+
-  geom_line(aes(size, mean, color=expr), data=algo.stats, size=2)+
+  geom_line(aes(size, median, color=expr), data=algo.stats, size=2)+
   geom_point(aes(size, milliseconds, color=expr), data=ms, pch=1)+
   ylab("milliseconds")+
   xlab("data set size")+

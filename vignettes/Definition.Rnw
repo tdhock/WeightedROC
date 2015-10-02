@@ -10,6 +10,8 @@
 \DeclareMathOperator*{\Diag}{Diag}
 \DeclareMathOperator*{\TPR}{TPR}
 \DeclareMathOperator*{\FPR}{FPR}
+\DeclareMathOperator*{\FN}{FN}
+\DeclareMathOperator*{\FP}{FP}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\maximize}{maximize}
 \DeclareMathOperator*{\minimize}{minimize}
@@ -70,6 +72,27 @@ $t_\tau:\RR\rightarrow\{-1, 1\}$ as
 \end{equation}
 
 We define the weighted false
+positive count as
+\begin{equation}
+  \label{eq:weighted_FP}
+  \FP(\tau) =
+  \sum_{i\in\mathcal I_{-1}}
+  I\left[
+    t_\tau(\hat y_i) \neq -1
+  \right]
+  w_i
+\end{equation}
+and the weighted false negative count as
+\begin{equation}
+  \label{eq:weighted_FN}
+  \FN(\tau) =
+  \sum_{i\in\mathcal I_{1}}
+  I\left[
+    t_\tau(\hat y_i) \neq 1
+  \right]
+  w_i.
+\end{equation}
+We define the weighted false
 positive rate as
 \begin{equation}
   \label{eq:weighted_FPR}
@@ -83,12 +106,12 @@ positive rate as
 \end{equation}
 and the weighted true positive rate as
 \begin{equation}
-  \label{eq:weighted_FPR}
+  \label{eq:weighted_TPR}
   \TPR(\tau) =
   \frac{1}{W_{1}}
   \sum_{i\in\mathcal I_{1}}
   I\left[
-    t_\tau(\hat y_i) \neq 1
+    t_\tau(\hat y_i) = 1
   \right]
   w_i.
 \end{equation}
