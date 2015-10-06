@@ -43,12 +43,20 @@ WeightedROC <- structure(function
   cum.negative <- cumsum(w.negative)
   is.end <- c(diff(y.hat) != 0, TRUE)
   n <- length(y)
-  TPR <- c(1, 1-cum.positive[is.end]/cum.positive[n])
-  FPR <- c(1, 1-cum.negative[is.end]/cum.negative[n])
-  d <- data.frame(TPR, FPR)
+  threshold <- c(y.hat[is.end], Inf)
+  total.positive <- cum.positive[n]
+  total.negative <- cum.negative[n]
+  FN <- c(0, cum.positive[is.end])
+  FNR <- FN/total.positive
+  TPR <- 1-FNR
+  TN <- c(0, cum.negative[is.end])
+  FP <- total.negative - TN
+  FPR <- FP/total.negative
+  d <- data.frame(TPR, FPR, threshold, FN, FP)
   d
-### data.frame with the true positive rate (TPR) and false positive
-### rate (FPR).
+### data.frame with true positive rate (TPR), false positive rate
+### (FPR), weighted false positive count (FP), weighted false negative
+### count (FN), and threshold (smallest guess classified as positive).
 }, ex=function(){
   ## WeightedROC can compute ROC curves for data sets with variable
   ## weights.
@@ -60,6 +68,28 @@ WeightedROC <- structure(function
   ggplot()+
     geom_path(aes(FPR, TPR), data=tp.fp)+
     coord_equal()
+
+  ## The FN/FP columns can be used to plot weighted error as a
+  ## function of threshold.
+  error.fun.list <- list(
+    FN=function(df)df$FN,
+    FP=function(df)df$FP,
+    errors=function(df)with(df, FP+FN)
+    )
+  all.error.list <- list()
+  for(error.type in names(error.fun.list)){
+    error.fun <- error.fun.list[[error.type]]
+    all.error.list[[error.type]] <-
+      data.frame(tp.fp, error.type, weighted.error=error.fun(tp.fp))
+  }
+  all.error <- do.call(rbind, all.error.list)
+  fp.fn.colors <- c(FP="skyblue",
+                    FN="#E41A1C",
+                    errors="black")
+  ggplot()+
+    scale_color_manual(values=fp.fn.colors)+
+    geom_line(aes(threshold, weighted.error, color=error.type),
+              data=all.error)
 
   library(ROCR)
   library(pROC)

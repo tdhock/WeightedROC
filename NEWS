@@ -1,3 +1,7 @@
+2015.10.02
+
+WeightedROC returns threshold, FP, FN.
+
 2014.7.10
 
 Compare with glmnet::auc.

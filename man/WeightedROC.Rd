@@ -11,8 +11,9 @@ integer/numeric with values all in {0=negative,1=positive} or
   \item{weight}{Positive weights, by default 1.}
 }
 
-\value{data.frame with the true positive rate (TPR) and false positive
-rate (FPR).}
+\value{data.frame with true positive rate (TPR), false positive rate
+(FPR), weighted false positive count (FP), weighted false negative
+count (FN), and threshold (smallest guess classified as positive).}
 
 \author{Toby Dylan Hocking}
 
@@ -30,6 +31,26 @@ library(ggplot2)
 ggplot()+
   geom_path(aes(FPR, TPR), data=tp.fp)+
   coord_equal()
+
+error.fun.list <- list(
+  FN=function(df)df$FN,
+  FP=function(df)df$FP,
+  errors=function(df)with(df, FP+FN)
+  )
+all.error.list <- list()
+for(error.type in names(error.fun.list)){
+  error.fun <- error.fun.list[[error.type]]
+  all.error.list[[error.type]] <-
+    data.frame(tp.fp, error.type, weighted.error=error.fun(tp.fp))
+}
+all.error <- do.call(rbind, all.error.list)
+fp.fn.colors <- c(FP="skyblue",
+                  FN="#E41A1C",
+                  errors="black")
+ggplot()+
+  scale_color_manual(values=fp.fn.colors)+
+  geom_line(aes(threshold, weighted.error, color=error.type),
+            data=all.error)
 
 library(ROCR)
 library(pROC)
