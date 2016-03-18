@@ -22,6 +22,12 @@ WeightedROC <- structure(function
   }
   ## by now, label must be in {-1,1}.
   stopifnot(label %in% c(-1,1))
+  if(all(label == 1)){
+    stop("no negative labels")
+  }
+  if(all(label == -1)){
+    stop("no positive labels")
+  }
   ## guess must be real.
   stopifnot(is.numeric(guess))
   stopifnot(length(label) == length(guess))
