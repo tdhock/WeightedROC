@@ -13,6 +13,11 @@ WeightedROC <- structure(function
     label <- as.integer(label)
   }
   stopifnot(is.numeric(label))
+  label.tab <- table(label)
+  if(length(label.tab) == 1){
+    print(label.tab)
+    stop("only one label value")
+  }
   if(all(label %in% c(0, 1))){
     label[label==0] <- -1
   }

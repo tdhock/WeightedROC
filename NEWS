@@ -1,3 +1,7 @@
+2016.03.22 PR#2
+
+WeightedROC stops with an error when there is only one value of label.
+
 2015.10.02
 
 WeightedROC returns threshold, FP, FN.
