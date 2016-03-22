@@ -6,7 +6,7 @@ test_that("data set with no positive labels is an error", {
   y.hat <- c(1, 2, 3, 4)
   expect_error({
     WeightedROC(y.hat, y, w)
-  }, "no positive labels")
+  }, "only one label value")
 })
 
 test_that("data set with no negative labels is an error", {
@@ -15,5 +15,5 @@ test_that("data set with no negative labels is an error", {
   y.hat <- c(1, 2, 3, 4)
   expect_error({
     WeightedROC(y.hat, y, w)
-  }, "no negative labels")
+  }, "only one label value")
 })
