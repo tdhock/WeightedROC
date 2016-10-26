@@ -11,4 +11,5 @@ Description: Fast computation of
 Suggests: ROCR, pROC, 
 	  microbenchmark,    
 	  glmnet, ElemStatLearn,
-	  testthat, ggplot2
+	  testthat, ggplot2,
+	  GsymPoint, geometry
