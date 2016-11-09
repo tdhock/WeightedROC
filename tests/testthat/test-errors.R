@@ -33,7 +33,7 @@ test_that("NA scores is an error", {
   y.hat <- c(1, NA, 3, 4)
   expect_error({
     tp.fp <- WeightedROC(y.hat, y, w)
-  }, "ROC curve undefined for NA scores")
+  }, "ROC curve undefined for NA guess")
 })
 
 test_that("NA weights is an error", {
