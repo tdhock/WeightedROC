@@ -1,7 +1,7 @@
 Package: WeightedROC
 Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
 Author: Toby Dylan Hocking
-Version: 2016.03.22
+Version: 2016.11.09
 License: GPL-3
 Title: Fast, weighted ROC curves
 Description: Fast computation of

@@ -1,3 +1,7 @@
+2016.11.09 PR#4
+
+WeightedROC stops with an error when guess has NA values.
+
 2016.03.22 PR#2
 
 WeightedROC stops with an error when there is only one value of label.
