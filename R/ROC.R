@@ -30,6 +30,9 @@ WeightedROC <- structure(function
   ## guess must be real.
   stopifnot(is.numeric(guess))
   stopifnot(length(label) == length(guess))
+  if(any(is.na(guess))){
+    stop("ROC curve undefined for NA guess")
+  }
   ## weights must be positive.
   stopifnot(is.numeric(weight))
   stopifnot(length(label) == length(weight))
