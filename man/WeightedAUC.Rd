@@ -16,6 +16,8 @@
 
 
 \examples{
+
+library(WeightedROC)
 ## Compute the AUC for this weighted data set.
 y <- c(-1, -1, 1, 1, 1)
 w <- c(1, 1, 1, 4, 5)
@@ -57,7 +59,7 @@ library(microbenchmark)
 ## faster than WeightedROC::WeightedAUC because glmnet::auc it does
 ## not include the overhead of computing a data.frame(TPR, FPR) that
 ## could be plotted.
-data(ROCR.simple)
+data(ROCR.simple, envir=environment())
 microbenchmark(WeightedROC={
   tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
   wroc <- WeightedAUC(tp.fp)
@@ -70,13 +72,13 @@ microbenchmark(WeightedROC={
   gnet <- with(ROCR.simple, {
     glmnet::auc(labels, predictions, rep(1, length(labels)))
   })
-})
+}, times=10)
 rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet) #same
 
 ## For the un-weighted pROC example data set, verify that our AUC is
 ## the same as that of ROCR/pROC. WARNING: glmnet::auc does not work
 ## for these data since there are ties in the aSAH$s100b score.
-data(aSAH)
+data(aSAH, envir=environment())
 table(aSAH$s100b)
 microbenchmark(WeightedROC={
   tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
@@ -90,6 +92,7 @@ microbenchmark(WeightedROC={
   gnet <- with(aSAH, {
     glmnet::auc(outcome, s100b, rep(1, length(s100b)))
   })
-})
+}, times=10)
 rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet)
+
 }

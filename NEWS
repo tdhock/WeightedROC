@@ -1,3 +1,7 @@
+2017.06.08 PR#5
+
+data(foo, envir=environment()) to pass CRAN checks.
+
 2016.11.09 PR#4
 
 WeightedROC stops with an error when guess has NA values.
