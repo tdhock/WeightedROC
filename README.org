@@ -1,6 +1,7 @@
 Fast, weighted ROC curves
 
-[[https://travis-ci.org/tdhock/WeightedROC][https://travis-ci.org/tdhock/WeightedROC.png?branch=master]]
+| [[file:tests/testthat][tests]]    | [[https://travis-ci.org/tdhock/WeightedROC][https://travis-ci.org/tdhock/WeightedROC.png?branch=master]]                           |
+| [[https://github.com/jimhester/covr][coverage]] | [[https://coveralls.io/github/tdhock/WeightedROC?branch=master][https://coveralls.io/repos/tdhock/WeightedROC/badge.svg?branch=master&service=github]] |
 
 Receiver Operating Characteristic (ROC) curve analysis is one way to
 evaluate an algorithm for binary classification. R packages

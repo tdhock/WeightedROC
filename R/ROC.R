@@ -117,7 +117,7 @@ WeightedROC <- structure(function
     proc <- roc(labels ~ predictions, ROCR.simple, algorithm=2)
   }, pROC.3={
     proc <- roc(labels ~ predictions, ROCR.simple, algorithm=3)
-  })
+  }, times=10)
   perfDF <- function(p){
     data.frame(FPR=p@x.values[[1]], TPR=p@y.values[[1]], package="ROCR")
   }
@@ -146,7 +146,7 @@ WeightedROC <- structure(function
     proc <- roc(outcome ~ s100b, aSAH, algorithm=2)
   }, pROC.3={
     proc <- roc(outcome ~ s100b, aSAH, algorithm=3)
-  })
+  }, times=10)
   roc.curves <- rbind(
     data.frame(tp.fp[, c("FPR", "TPR")], package="WeightedROC"),
     perfDF(perf),
@@ -170,7 +170,7 @@ WeightedROC <- structure(function
     proc <- roc(y ~ y.hat, algorithm=2)
   }, pROC.3={
     proc <- roc(y ~ y.hat, algorithm=3)
-  })
+  }, times=10)
   roc.curves <- rbind(
     data.frame(tp.fp[, c("FPR", "TPR")], package="WeightedROC"),
     perfDF(perf),

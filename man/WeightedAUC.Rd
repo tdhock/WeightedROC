@@ -72,7 +72,7 @@ microbenchmark(WeightedROC={
   gnet <- with(ROCR.simple, {
     glmnet::auc(labels, predictions, rep(1, length(labels)))
   })
-})
+}, times=10)
 rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet) #same
 
 ## For the un-weighted pROC example data set, verify that our AUC is
@@ -92,7 +92,7 @@ microbenchmark(WeightedROC={
   gnet <- with(aSAH, {
     glmnet::auc(outcome, s100b, rep(1, length(s100b)))
   })
-})
+}, times=10)
 rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet)
 
 }
