@@ -21,8 +21,10 @@ count (FN), and threshold (smallest guess classified as positive).}
 
 
 \examples{
+
 ## WeightedROC can compute ROC curves for data sets with variable
 ## weights.
+library(WeightedROC)
 y <- c(-1, -1, 1, 1, 1)
 w <- c(1, 1, 1, 4, 5)
 y.hat <- c(1, 2, 3, 1, 1)
@@ -32,6 +34,8 @@ ggplot()+
   geom_path(aes(FPR, TPR), data=tp.fp)+
   coord_equal()
 
+## The FN/FP columns can be used to plot weighted error as a
+## function of threshold.
 error.fun.list <- list(
   FN=function(df)df$FN,
   FP=function(df)df$FP,
@@ -55,7 +59,7 @@ ggplot()+
 library(ROCR)
 library(pROC)
 library(microbenchmark)
-data(ROCR.simple)
+data(ROCR.simple, envir=environment())
 ## Compare speed and plot ROC curves for the ROCR example data set.
 microbenchmark(WeightedROC={
   tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
@@ -75,14 +79,17 @@ perfDF <- function(p){
 procDF <- function(p){
   data.frame(FPR=1-p$specificities, TPR=p$sensitivities, package="pROC")
 }
-roc.curves <- rbind(data.frame(tp.fp, package="WeightedROC"),
-                    perfDF(perf), procDF(proc))
+roc.curves <- rbind(
+  data.frame(tp.fp[, c("FPR", "TPR")], package="WeightedROC"),
+  perfDF(perf),
+  procDF(proc))
 ggplot()+
   geom_path(aes(FPR, TPR, color=package, linetype=package),
             data=roc.curves, size=1)+
   coord_equal()
+
 ## Compare speed and plot ROC curves for the pROC example data set.
-data(aSAH)
+data(aSAH, envir=environment())
 microbenchmark(WeightedROC={
   tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
 }, ROCR={
@@ -95,12 +102,15 @@ microbenchmark(WeightedROC={
 }, pROC.3={
   proc <- roc(outcome ~ s100b, aSAH, algorithm=3)
 })
-roc.curves <- rbind(data.frame(tp.fp, package="WeightedROC"),
-                    perfDF(perf), procDF(proc))
+roc.curves <- rbind(
+  data.frame(tp.fp[, c("FPR", "TPR")], package="WeightedROC"),
+  perfDF(perf),
+  procDF(proc))
 ggplot()+
   geom_path(aes(FPR, TPR, color=package, linetype=package),
             data=roc.curves, size=1)+
   coord_equal()
+
 ## Compute a small ROC curve with 1 tie to show the diagonal.
 y <- c(-1, -1, 1, 1)
 y.hat <- c(1, 2, 3, 1)
@@ -116,10 +126,13 @@ microbenchmark(WeightedROC={
 }, pROC.3={
   proc <- roc(y ~ y.hat, algorithm=3)
 })
-roc.curves <- rbind(data.frame(tp.fp, package="WeightedROC"),
-                    perfDF(perf), procDF(proc))
+roc.curves <- rbind(
+  data.frame(tp.fp[, c("FPR", "TPR")], package="WeightedROC"),
+  perfDF(perf),
+  procDF(proc))
 ggplot()+
   geom_path(aes(FPR, TPR, color=package, linetype=package),
             data=roc.curves, size=1)+
   coord_equal()
+
 }
