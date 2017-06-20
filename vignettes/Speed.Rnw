@@ -78,18 +78,18 @@ compute the ROC curves using WeightedROC, pROC, and ROCR.
 library(WeightedROC)
 library(ROCR)
 library(pROC)
-library(microbenchmark)
 set <- sets$test
 guess <- predict(fit, set$features)
-microbenchmark(WeightedROC={
-  wroc <- WeightedROC(guess, set$label)
-}, ROCR={
-  pred <- prediction(guess, set$label)
-  perf <- performance(pred, "tpr", "fpr")
-}, pROC={
-  proc <- roc(set$label, guess, algorithm=2)
-})
-
+if(require(microbenchmark)){
+  microbenchmark(WeightedROC={
+    wroc <- WeightedROC(guess, set$label)
+  }, ROCR={
+    pred <- prediction(guess, set$label)
+    perf <- performance(pred, "tpr", "fpr")
+  }, pROC={
+    proc <- roc(set$label, guess, algorithm=2)
+  })
+}
 @ 
 
 It is clear that WeightedROC is the fastest computation (on my
@@ -124,46 +124,47 @@ differences between algorithms as the number of data points
 changes. 
 
 <<scaling, fig=TRUE>>=
-stats.by.size.expr <- list()
-ms.by.size <- list()
-for(size in c(400, 800, 1200, 1500, 2000, 2300)){
-  indices <- seq(1, length(set$label), l=size)
-  y <- set$label[indices]
-  y.hat <- guess[indices]
-  this.size <- microbenchmark(WeightedROC={
-    wroc <- WeightedROC(y.hat, y)
-  }, ROCR={
-    pred <- prediction(y.hat, y)
-    perf <- performance(pred, "tpr", "fpr")
-  }, pROC.1={
-    proc <- roc(y, y.hat, algorithm=1)
-  }, pROC.2={
-    proc <- roc(y, y.hat, algorithm=2)
-  })
-  this.size$milliseconds <- this.size$time/1e6
-  ms.by.size[[paste(size)]] <- data.frame(size, this.size)
-  this.by.expr <- split(this.size, this.size$expr)
-  for(expr in names(this.by.expr)){
-    stats <- with(this.by.expr[[expr]], {
-      data.frame(median=median(milliseconds),
-                 q25=quantile(milliseconds, 0.25),
-                 q75=quantile(milliseconds, 0.75))
+if(require(microbenchmark)){
+  stats.by.size.expr <- list()
+  ms.by.size <- list()
+  for(size in c(400, 800, 1200, 1500, 2000, 2300)){
+    indices <- seq(1, length(set$label), l=size)
+    y <- set$label[indices]
+    y.hat <- guess[indices]
+    this.size <- microbenchmark(WeightedROC={
+      wroc <- WeightedROC(y.hat, y)
+    }, ROCR={
+      pred <- prediction(y.hat, y)
+      perf <- performance(pred, "tpr", "fpr")
+    }, pROC.1={
+      proc <- roc(y, y.hat, algorithm=1)
+    }, pROC.2={
+      proc <- roc(y, y.hat, algorithm=2)
     })
-    stats.by.size.expr[[paste(size, expr)]] <- data.frame(size, expr, stats)
+    this.size$milliseconds <- this.size$time/1e6
+    ms.by.size[[paste(size)]] <- data.frame(size, this.size)
+    this.by.expr <- split(this.size, this.size$expr)
+    for(expr in names(this.by.expr)){
+      stats <- with(this.by.expr[[expr]], {
+        data.frame(median=median(milliseconds),
+                   q25=quantile(milliseconds, 0.25),
+                   q75=quantile(milliseconds, 0.75))
+      })
+      stats.by.size.expr[[paste(size, expr)]] <- data.frame(size, expr, stats)
+    }
   }
+  ms <- do.call(rbind, ms.by.size)
+  algo.stats <- do.call(rbind, stats.by.size.expr)
+  timePlot <- ggplot()+
+    geom_ribbon(aes(size, ymin=q25, ymax=q75, fill=expr), 
+                data=algo.stats, alpha=1/2)+
+    geom_line(aes(size, median, color=expr), data=algo.stats, size=2)+
+    geom_point(aes(size, milliseconds, color=expr), data=ms, pch=1)+
+    ylab("milliseconds")+
+    xlab("data set size")+
+    ggtitle("mean +/- 1 standard deviation")
+  print(timePlot)
 }
-ms <- do.call(rbind, ms.by.size)
-algo.stats <- do.call(rbind, stats.by.size.expr)
-timePlot <- ggplot()+
-  geom_ribbon(aes(size, ymin=q25, ymax=q75, fill=expr), 
-              data=algo.stats, alpha=1/2)+
-  geom_line(aes(size, median, color=expr), data=algo.stats, size=2)+
-  geom_point(aes(size, milliseconds, color=expr), data=ms, pch=1)+
-  ylab("milliseconds")+
-  xlab("data set size")+
-  ggtitle("mean +/- 1 standard deviation")
-print(timePlot)
-
 @ 
 
 The figure above shows that for the spam data, the data set size does
