@@ -53,46 +53,49 @@ rbind(`glmnet::auc`=c(unequal.weights=glmnet::auc(y, y.hat, w),
         
 library(ROCR)
 library(pROC)
-library(microbenchmark)
 ## For the un-weighted ROCR example data set, verify that our AUC is
 ## the same as that of ROCR/pROC/glmnet. Note that glmnet::auc is
 ## faster than WeightedROC::WeightedAUC because glmnet::auc it does
 ## not include the overhead of computing a data.frame(TPR, FPR) that
 ## could be plotted.
 data(ROCR.simple, envir=environment())
-microbenchmark(WeightedROC={
-  tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
-  wroc <- WeightedAUC(tp.fp)
-}, ROCR={
-  pred <- with(ROCR.simple, prediction(predictions, labels))
-  rocr <- performance(pred, "auc")@y.values[[1]]
-}, pROC={
-  proc <- pROC::auc(labels ~ predictions, ROCR.simple, algorithm=2)
-}, glmnet={
-  gnet <- with(ROCR.simple, {
-    glmnet::auc(labels, predictions, rep(1, length(labels)))
-  })
-}, times=10)
-rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet) #same
+if(require(microbenchmark)){
+  microbenchmark(WeightedROC={
+    tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
+    wroc <- WeightedAUC(tp.fp)
+  }, ROCR={
+    pred <- with(ROCR.simple, prediction(predictions, labels))
+    rocr <- performance(pred, "auc")@y.values[[1]]
+  }, pROC={
+    proc <- pROC::auc(labels ~ predictions, ROCR.simple, algorithm=2)
+  }, glmnet={
+    gnet <- with(ROCR.simple, {
+      glmnet::auc(labels, predictions, rep(1, length(labels)))
+    })
+  }, times=10)
+  rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet) #same
+}
 
 ## For the un-weighted pROC example data set, verify that our AUC is
 ## the same as that of ROCR/pROC. WARNING: glmnet::auc does not work
 ## for these data since there are ties in the aSAH$s100b score.
 data(aSAH, envir=environment())
 table(aSAH$s100b)
-microbenchmark(WeightedROC={
-  tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
-  wroc <- WeightedAUC(tp.fp)
-}, ROCR={
-  pred <- with(aSAH, prediction(s100b, outcome))
-  rocr <- performance(pred, "auc")@y.values[[1]]
-}, pROC={
-  proc <- pROC::auc(outcome ~ s100b, aSAH, algorithm=2)
-}, glmnet={
-  gnet <- with(aSAH, {
-    glmnet::auc(outcome, s100b, rep(1, length(s100b)))
-  })
-}, times=10)
-rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet)
+if(require(microbenchmark)){
+  microbenchmark(WeightedROC={
+    tp.fp <- with(aSAH, WeightedROC(s100b, outcome))
+    wroc <- WeightedAUC(tp.fp)
+  }, ROCR={
+    pred <- with(aSAH, prediction(s100b, outcome))
+    rocr <- performance(pred, "auc")@y.values[[1]]
+  }, pROC={
+    proc <- pROC::auc(outcome ~ s100b, aSAH, algorithm=2)
+  }, glmnet={
+    gnet <- with(aSAH, {
+      glmnet::auc(outcome, s100b, rep(1, length(s100b)))
+    })
+  }, times=10)
+  rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet)
+}
 
 }
