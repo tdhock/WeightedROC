@@ -89,6 +89,11 @@ if(require(microbenchmark)){
   }, pROC={
     proc <- roc(set$label, guess, algorithm=2)
   })
+}else{
+  wroc <- WeightedROC(guess, set$label)
+  pred <- prediction(guess, set$label)
+  perf <- performance(pred, "tpr", "fpr")
+  proc <- roc(set$label, guess, algorithm=2)
 }
 @ 
 
