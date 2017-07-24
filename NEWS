@@ -1,3 +1,7 @@
+2017.07.24
+
+if(require(microbenchmark)) in ROC example for CRAN.
+
 2017.07.12
 
 if(require(microbenchmark)) in examples for CRAN.
