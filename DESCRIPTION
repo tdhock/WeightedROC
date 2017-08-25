@@ -9,7 +9,8 @@ Description: Fast computation of
  and Area Under the Curve (AUC)
  for weighted binary classification problems
  (weights are example-specific cost values).
-Suggests: ROCR, pROC, 
+Suggests: ROCR, pROC,
+	  PRROC,
 	  microbenchmark,    
 	  glmnet, ElemStatLearn,
 	  testthat, ggplot2

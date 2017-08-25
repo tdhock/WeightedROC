@@ -23,38 +23,49 @@ WeightedAUC <- structure(function
 
   library(WeightedROC)
   ## Compute the AUC for this weighted data set.
-  y <- c(-1, -1, 1, 1, 1)
+  y <- c(0, 0, 1, 1, 1)
   w <- c(1, 1, 1, 4, 5)
   y.hat <- c(1, 2, 3, 1, 1)
   tp.fp <- WeightedROC(y.hat, y, w)
-  wauc <- WeightedAUC(tp.fp)
-  wauc
+  (wauc <- WeightedAUC(tp.fp))
 
-  ## glmnet 1.9-5 (2013-8-1) also has a function called auc but it
-  ## does not compute the correct AUC when there are ties in the
-  ## predicted score (y.hat).
-  library(glmnet)
-  rbind(`glmnet::auc`=c(unequal.weights=glmnet::auc(y, y.hat, w),
-          no.weights=glmnet::auc(y, y.hat),
-          equal.weights=glmnet::auc(y, y.hat, rep(1, length(y)))),
-        `WeightedROC::WeightedAUC`=c(wauc,
-          WeightedAUC(WeightedROC(y.hat, y)),
-          WeightedAUC(WeightedROC(y.hat, y, rep(1, length(y))))))          
+  if(require(glmnet)){
 
-  ## with no ties, glmnet::auc can give the correct answer. For the
-  ## case with equal weights you must provide a vector of equal
-  ## weights as an argument (if you leave the third argument of
-  ## glmnet::auc missing, then it gives the wrong answer).
-  y <- c(-1, -1, 1, -1, 1)
-  y.hat <- c(1, 2, 3, 4, 5)
-  w <- c(1, 1, 1, 4, 5)
-  rbind(`glmnet::auc`=c(unequal.weights=glmnet::auc(y, y.hat, w),
-          no.weights=glmnet::auc(y, y.hat),
-          equal.weights=glmnet::auc(y, y.hat, rep(1, length(y)))),
-        `WeightedROC::WeightedAUC`=c(WeightedAUC(WeightedROC(y.hat, y, w)),
-          WeightedAUC(WeightedROC(y.hat, y)),
-          WeightedAUC(WeightedROC(y.hat, y, rep(1, length(y))))))
-          
+    ## glmnet 1.9-5 (2013-8-1) also has a function called auc, with a
+    ## third argument "w" that seems to be for weights. In a data set
+    ## with no tied scores, glmnet::auc is the same as WeightedAUC.
+    y <- c(0, 0, 1, 0, 1)
+    y.hat <- c(1, 2, 3, 4, 5)
+    w <- c(1, 1, 1, 4, 5)
+    rbind(
+      `glmnet::auc`=c(
+        missing.weights=glmnet::auc(y, y.hat),
+        unequal.weights=glmnet::auc(y, y.hat, w),
+        equal.weights=glmnet::auc(y, y.hat, rep(1, length(y)))),
+      `WeightedROC::WeightedAUC`=c(
+        WeightedAUC(WeightedROC(y.hat, y)),
+        WeightedAUC(WeightedROC(y.hat, y, w)),
+        WeightedAUC(WeightedROC(y.hat, y, rep(1, length(y))))))
+    
+    ## In a data set with tied scores, using glmnet::auc(y,prob) with
+    ## a missing third argument gives the same result as WeightedAUC,
+    ## but glmnet::auc(y,prob,w) does not.
+    set.seed(1)
+    y <- c(0, 0, 1, 1, 1)
+    w <- c(1, 1, 1, 4, 5)
+    y.hat <- c(1, 2, 3, 1, 1)
+    rbind(
+      `glmnet::auc`=c(
+        missing.weights=glmnet::auc(y, y.hat),
+        unequal.weights=glmnet::auc(y, y.hat, w),
+        equal.weights=glmnet::auc(y, y.hat, rep(1, length(y)))),
+      `WeightedROC::WeightedAUC`=c(
+        WeightedAUC(WeightedROC(y.hat, y)),
+        wauc,
+        WeightedAUC(WeightedROC(y.hat, y, rep(1, length(y))))))
+    
+  }
+
   library(ROCR)
   library(pROC)
   ## For the un-weighted ROCR example data set, verify that our AUC is
@@ -81,8 +92,7 @@ WeightedAUC <- structure(function
   }
 
   ## For the un-weighted pROC example data set, verify that our AUC is
-  ## the same as that of ROCR/pROC. WARNING: glmnet::auc does not work
-  ## for these data since there are ties in the aSAH$s100b score.
+  ## the same as that of ROCR/pROC/glmnet. 
   data(aSAH, envir=environment())
   table(aSAH$s100b)
   if(require(microbenchmark)){
@@ -96,7 +106,7 @@ WeightedAUC <- structure(function
       proc <- pROC::auc(outcome ~ s100b, aSAH, algorithm=2)
     }, glmnet={
       gnet <- with(aSAH, {
-        glmnet::auc(outcome, s100b, rep(1, length(s100b)))
+        glmnet::auc(ifelse(outcome=="Good", 0, 1), s100b, rep(1, length(s100b)))
       })
     }, times=10)
     rbind(WeightedROC=wroc, ROCR=rocr, pROC=proc, glmnet=gnet)
