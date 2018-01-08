@@ -1,7 +1,7 @@
 Package: WeightedROC
 Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
 Author: Toby Dylan Hocking
-Version: 2017.07.12
+Version: 2017.08.25
 License: GPL-3
 Title: Fast, Weighted ROC Curves
 Description: Fast computation of
@@ -9,7 +9,8 @@ Description: Fast computation of
  and Area Under the Curve (AUC)
  for weighted binary classification problems
  (weights are example-specific cost values).
-Suggests: ROCR, pROC, 
+Suggests: ROCR, pROC,
+	  PRROC,
 	  microbenchmark,    
 	  glmnet, ElemStatLearn,
 	  testthat, ggplot2
