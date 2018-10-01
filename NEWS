@@ -1,3 +1,11 @@
+2018.10.1 PR#3
+
+new tests compare with geometry and GsymPoint.
+
+simplify vignette/examples (remove AUC from Speed vignette).
+
+always require rather than library the suggested packages.
+
 2017.08.25
 
 comparisons with PRROC.
