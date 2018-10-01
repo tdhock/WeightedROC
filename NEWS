@@ -1,3 +1,7 @@
+2018.10.1 PR#3
+
+new tests compare with geometry and GsymPoint.
+
 2016.03.22 PR#2
 
 WeightedROC stops with an error when there is only one value of label.
