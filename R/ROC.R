@@ -74,10 +74,14 @@ WeightedROC <- structure(function
   w <- c(1, 1, 1, 4, 5)
   y.hat <- c(1, 2, 3, 1, 1)
   tp.fp <- WeightedROC(y.hat, y, w)
-  library(ggplot2)
-  ggplot()+
-    geom_path(aes(FPR, TPR), data=tp.fp)+
-    coord_equal()
+  if(require(ggplot2)){
+    gg <- ggplot()+
+      geom_path(aes(FPR, TPR), data=tp.fp)+
+      coord_equal()
+    print(gg)
+  }else{
+    plot(TPR~FPR, tp.fp, type="l")
+  }
 
   ## The FN/FP columns can be used to plot weighted error as a
   ## function of threshold.

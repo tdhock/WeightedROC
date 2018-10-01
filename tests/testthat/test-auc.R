@@ -17,16 +17,10 @@ gsym.point.GPQ.elastase <- gsym.point(
   trace = FALSE, seed = FALSE, value.seed = 3)
 tp.fp <- with(elastase, WeightedROC(elas, status))
 my.auc <- WeightedAUC(tp.fp)
-gsym.auc <- GsymPoint:::calculate.empirical.AUC(elastase, "elas", "status", 0)$AUC
+gsym.auc <- GsymPoint:::calculate.empirical.AUC(elastase, "elas", "status", 0)
 test_that("AUC consistent with GsymPoint for elastase data set", {
   expect_equal(my.auc, gsym.auc)
 })
-if(interactive()){
-  plot(gsym.point.GPQ.elastase)
-  with(tp.fp, lines(FPR, TPR, col="red"))
-  legend("bottomright", legend=c("GsymPoint", "WeightedROC"), col=c("black", "red"), lty=1)
-  ties(elastase$elas)
-}
 
 ## Figure 1: melanoma cancer data.
 data(melanoma)
@@ -37,16 +31,10 @@ melanoma.cutpoint1 <- gsym.point(
   trace = FALSE, seed = TRUE, value.seed = 3)
 tp.fp <- with(melanoma, WeightedROC(X, group))
 my.auc <- WeightedAUC(tp.fp)
-gsym.auc <- GsymPoint:::calculate.empirical.AUC(melanoma, "X", "group", 0)$AUC
+gsym.auc <- GsymPoint:::calculate.empirical.AUC(melanoma, "X", "group", 0)
 test_that("AUC consistent with GsymPoint for melanoma data set", {
   expect_equal(my.auc, gsym.auc)
 })
-if(interactive()){
-  plot(melanoma.cutpoint1)
-  with(tp.fp, lines(FPR, TPR, col="red"))
-  legend("bottomright", legend=c("GsymPoint", "WeightedROC"), col=c("black", "red"), lty=1)
-  ties(melanoma$X)
-}
 
 ## Figure 2: prostate cancer data.
 data(prostate)
@@ -57,30 +45,10 @@ gsym.point.GPQ.prostate <- gsym.point(
   trace = FALSE, seed = TRUE, value.seed = 3)
 tp.fp <- with(prostate, WeightedROC(marker, status))
 my.auc <- WeightedAUC(tp.fp)
-gsym.auc <- GsymPoint:::calculate.empirical.AUC(prostate, "marker", "status", 0)$AUC
+gsym.auc <- GsymPoint:::calculate.empirical.AUC(prostate, "marker", "status", 0)
 test_that("AUC consistent with GsymPoint for melanoma data set", {
   expect_equal(my.auc, gsym.auc)
 })
-if(interactive()){
-  pdf("~/reviews/2016-GsymPoint/figure-Gsympoint.pdf")
-  plot(gsym.point.GPQ.prostate)
-  with(tp.fp, lines(FPR, TPR, col="red", lty="dotted", lwd=2))
-  with(gsym.point.GPQ.prostate$GPQ$Global$optimal.result, {
-    points(1-Specificity[, "Value"], Sensitivity[, "Value"], col="violet")
-    rect(
-      1-Specificity[, "ul"], Sensitivity[, "ll"],
-      1-Specificity[, "ll"], Sensitivity[, "ul"],
-      col="violet", density=0)
-  })
-  legend(
-    "right",
-    legend=c("GsymPoint ROC curve", "WeightedROC curve", "GsymPoint GPQ estimate"),
-    col=c("black", "red", "violet"),
-    lty=c("solid", "dotted", "solid"),
-    lwd=c(1, 2, 1))
-  ties(prostate$marker)
-  dev.off()
-}
 
 library(geometry)
 ## (FPR,TPR) starts at (1,1) and ends at (0,0)

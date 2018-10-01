@@ -66,15 +66,13 @@ WeightedAUC <- structure(function
     
   }
 
-  library(ROCR)
-  library(pROC)
   ## For the un-weighted ROCR example data set, verify that our AUC is
   ## the same as that of ROCR/pROC/glmnet. Note that glmnet::auc is
   ## faster than WeightedROC::WeightedAUC because glmnet::auc it does
   ## not include the overhead of computing a data.frame(TPR, FPR) that
   ## could be plotted.
   data(ROCR.simple, envir=environment())
-  if(require(microbenchmark)){
+  if(require(microbenchmark) && require(ROCR) && require(pROC)){
     microbenchmark(WeightedROC={
       tp.fp <- with(ROCR.simple, WeightedROC(predictions, labels))
       wroc <- WeightedAUC(tp.fp)
