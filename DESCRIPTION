@@ -1,14 +1,16 @@
 Package: WeightedROC
-Maintainer: Toby Dylan Hocking <tdhock5@gmail.com>
+Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
 Author: Toby Dylan Hocking
 Version: 2018.10.1
 License: GPL-3
-Title: Fast, weighted ROC curves
+Title: Fast, Weighted ROC Curves
 Description: Fast computation of
  Receiver Operating Characteristic (ROC) curves
  and Area Under the Curve (AUC)
- for weighted binary classification problems.
-Suggests: ROCR, pROC, 
+ for weighted binary classification problems
+ (weights are example-specific cost values).
+Suggests: ROCR, pROC,
+	  PRROC,
 	  microbenchmark,    
 	  glmnet, ElemStatLearn,
 	  testthat, ggplot2,

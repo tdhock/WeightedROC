@@ -2,6 +2,30 @@
 
 new tests compare with geometry and GsymPoint.
 
+2017.08.25
+
+comparisons with PRROC.
+
+2017.07.24
+
+if(require(microbenchmark)) in ROC example for CRAN.
+
+2017.07.12
+
+if(require(microbenchmark)) in examples for CRAN.
+
+2017.07.11
+
+if(require(microbenchmark)) in vignettes for CRAN.
+
+2017.06.08 PR#5
+
+data(foo, envir=environment()) to pass CRAN checks.
+
+2016.11.09 PR#4
+
+WeightedROC stops with an error when guess has NA values.
+
 2016.03.22 PR#2
 
 WeightedROC stops with an error when there is only one value of label.

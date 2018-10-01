@@ -39,6 +39,7 @@ downloadable PDF at
 The data set is available in the R package ElemStatLearn:
 
 <<data>>=
+
 library(ElemStatLearn)
 data(spam)
 is.label <- names(spam) == "spam"
@@ -50,6 +51,7 @@ sets <-
   list(train=list(features=X[train.i, ], label=y[train.i]),
        test=list(features=X[-train.i, ], label=y[-train.i]))
 str(sets)
+
 @ 
 
 I divided the data set into half train, half test. I will fit a model
@@ -61,53 +63,83 @@ Below, I fit an L1-regularized logistic regression model to the spam
 training set.
 
 <<model>>=
+
 library(glmnet)
 system.time({
   fit <- cv.glmnet(sets$train$features, sets$train$label, family="binomial")
 })
+
 @ 
 
-On my Intel i7 2.8GHz CPU, it took about 10 seconds to fit the model.
+On my Intel(R) Pentium(R) Dual CPU T2390 @ 1.86GHz, it took about 25
+seconds to fit the model.
 
 \section{Timing test ROC curve computation}
 
 ROC analysis is useful for evaluating binary classifiers. Below we
-compute the ROC curves using WeightedROC, pROC, and ROCR.
+compute the ROC curves using WeightedROC, PRROC, pROC, and ROCR.
 
 <<test-ROC-time>>=
+
 library(WeightedROC)
 library(ROCR)
 library(pROC)
-library(microbenchmark)
+library(PRROC)
 set <- sets$test
-guess <- predict(fit, set$features)
-microbenchmark(WeightedROC={
+label.num <- ifelse(set$label=="spam", 1, 0)
+guess <- as.numeric(predict(fit, set$features))
+df.list <- split(data.frame(guess, label.num), set$label)
+if(require(microbenchmark)){
+  microbenchmark(PRROC1={
+    prroc1 <- roc.curve(
+      df.list$spam$guess, df.list$email$guess, 
+      curve=TRUE)
+  }, PRROC2={
+    prroc2 <- roc.curve(guess, weights.class0=label.num, curve=TRUE)
+  }, WeightedROC={
+    wroc <- WeightedROC(guess, label.num)
+  }, ROCR={
+    pred <- prediction(guess, set$label)
+    perf <- performance(pred, "tpr", "fpr")
+  }, pROC={
+    proc <- roc(set$label, guess, algorithm=2)
+  }, times=10)
+}else{
+  prroc1 <- roc.curve(
+    df.list$spam$guess, df.list$email$guess, 
+    curve=TRUE)
+  prroc2 <- roc.curve(guess, weights.class0=label.num, curve=TRUE)
   wroc <- WeightedROC(guess, set$label)
-}, ROCR={
   pred <- prediction(guess, set$label)
   perf <- performance(pred, "tpr", "fpr")
-}, pROC={
   proc <- roc(set$label, guess, algorithm=2)
-})
+}
 
 @ 
 
-It is clear that WeightedROC is the fastest computation (on my
-computer, median 1.8 milliseconds), followed by ROCR (7.2
-milliseconds), and finally pROC (26.4 milliseconds). However, all of
-the ROC computations are much faster than the model fitting (10
-seconds). Below, we plot the ROC curves.
+It is clear that PRROC is the fastest computation (on my computer,
+median 3.7 milliseconds), followed by WeightedROC (7.9 milliseconds),
+then ROCR (9.6 milliseconds), and finally pROC (52.4
+milliseconds). However, all of the ROC computations are much faster
+than the model fitting (10 seconds). Below, we plot the ROC curves to
+show that they are all the same.
 
 <<test-ROC-curves, fig=TRUE>>=
+
 perfDF <- function(p){
   data.frame(FPR=p@x.values[[1]], TPR=p@y.values[[1]], package="ROCR")
 }
 procDF <- function(p){
   data.frame(FPR=1-p$specificities, TPR=p$sensitivities, package="pROC")
 }
+prrocDF <- function(p, package){
+  data.frame(FPR=p$curve[,1], TPR=p$curve[,2], package)
+}
 roc.curves <- 
   rbind(data.frame(wroc[,c("FPR", "TPR")], package="WeightedROC"),
-        perfDF(perf), procDF(proc))
+        perfDF(perf), procDF(proc), 
+        prrocDF(prroc1, "PRROC1"), 
+        prrocDF(prroc2, "PRROC2"))
 library(ggplot2)
 rocPlot <- ggplot()+
   geom_path(aes(FPR, TPR, color=package, linetype=package),
@@ -124,52 +156,115 @@ differences between algorithms as the number of data points
 changes. 
 
 <<scaling, fig=TRUE>>=
-stats.by.size.expr <- list()
-ms.by.size <- list()
-for(size in c(400, 800, 1200, 1500, 2000, 2300)){
-  indices <- seq(1, length(set$label), l=size)
-  y <- set$label[indices]
-  y.hat <- guess[indices]
-  this.size <- microbenchmark(WeightedROC={
-    wroc <- WeightedROC(y.hat, y)
-  }, ROCR={
-    pred <- prediction(y.hat, y)
-    perf <- performance(pred, "tpr", "fpr")
-  }, pROC.1={
-    proc <- roc(y, y.hat, algorithm=1)
-  }, pROC.2={
-    proc <- roc(y, y.hat, algorithm=2)
-  })
-  this.size$milliseconds <- this.size$time/1e6
-  ms.by.size[[paste(size)]] <- data.frame(size, this.size)
-  this.by.expr <- split(this.size, this.size$expr)
-  for(expr in names(this.by.expr)){
-    stats <- with(this.by.expr[[expr]], {
-      data.frame(median=median(milliseconds),
-                 q25=quantile(milliseconds, 0.25),
-                 q75=quantile(milliseconds, 0.75))
-    })
-    stats.by.size.expr[[paste(size, expr)]] <- data.frame(size, expr, stats)
+
+if(require(microbenchmark)){
+  stats.by.size.expr <- list()
+  ms.by.size <- list()
+  for(size in c(50, 100, 200, 400, 800, 1200, 1500, 2000, 2300)){
+    indices <- as.integer(seq(1, length(set$label), l=size))
+    y <- set$label[indices]
+    y.hat <- guess[indices]
+    this.size <- microbenchmark(PRROC1={
+      prroc1 <- roc.curve(
+        df.list$spam$guess, df.list$email$guess, 
+        curve=TRUE)
+    }, PRROC2={
+      prroc2 <- roc.curve(guess, weights.class0=label.num, curve=TRUE)
+    }, WeightedROC={
+      wroc <- WeightedROC(y.hat, y)
+    }, ROCR={
+      pred <- prediction(y.hat, y)
+      perf <- performance(pred, "tpr", "fpr")
+    }, pROC.1={
+      proc <- roc(y, y.hat, algorithm=1)
+    }, pROC.2={
+      proc <- roc(y, y.hat, algorithm=2)
+    }, times=10)
+    this.size$milliseconds <- this.size$time/1e6
+    ms.by.size[[paste(size)]] <- data.frame(size, this.size)
+    this.by.expr <- split(this.size, this.size$expr)
+    for(expr in names(this.by.expr)){
+      stats <- with(this.by.expr[[expr]], {
+        data.frame(median=median(milliseconds),
+                   q25=quantile(milliseconds, 0.25),
+                   q75=quantile(milliseconds, 0.75))
+      })
+      stats.by.size.expr[[paste(size, expr)]] <- data.frame(size, expr, stats)
+    }
   }
+  ms <- do.call(rbind, ms.by.size)
+  algo.stats <- do.call(rbind, stats.by.size.expr)
+  timePlot <- ggplot()+
+    geom_ribbon(aes(size, ymin=q25, ymax=q75, fill=expr), 
+                data=algo.stats, alpha=1/2)+
+    geom_line(aes(size, median, color=expr), data=algo.stats, size=2)+
+    geom_point(aes(size, milliseconds, color=expr), data=ms, pch=1)+
+    scale_y_log10("milliseconds")+
+    scale_x_log10("data set size")+
+    ggtitle("mean +/- 1 standard deviation")
+  print(timePlot)
 }
-ms <- do.call(rbind, ms.by.size)
-algo.stats <- do.call(rbind, stats.by.size.expr)
-timePlot <- ggplot()+
-  geom_ribbon(aes(size, ymin=q25, ymax=q75, fill=expr), 
-              data=algo.stats, alpha=1/2)+
-  geom_line(aes(size, median, color=expr), data=algo.stats, size=2)+
-  geom_point(aes(size, milliseconds, color=expr), data=ms, pch=1)+
-  ylab("milliseconds")+
-  xlab("data set size")+
-  ggtitle("mean +/- 1 standard deviation")
-print(timePlot)
 
 @ 
 
 The figure above shows that for the spam data, the data set size does
-not affect the speed ordering of the algorithms for ROC curve
-computation. In all cases, WeightedROC is fastest, followed by ROCR,
-then pROC.2, then pROC.1. It makes sense that pROC.2 is faster than
-pROC.1, since pROC.2 uses the cumsum function, but pROC.1 does not.
+affect the speed ordering of the other algorithms.
+\begin{itemize}
+\item For large data sets (N > 1000), PRROC1 is fastest, followed by
+  PRROC2, WeightedROC, ROCR, pROC.2, pROC.1. It makes sense that pROC.2 is
+  faster than pROC.1, since pROC.2 uses the cumsum function, but
+  pROC.1 does not.
+\item For small data sets (N < 500), WeightedROC is fastest, followed by pROC.1,
+  then pROC2, then ROCR.
+\end{itemize}
+
+\section{AUC computation}
+
+<<test-AUC-microbenchmark>>=
+
+auc.list <- list()
+if(require(microbenchmark)){
+  auc.time.df <- microbenchmark(glmnet={
+    auc.list$glmnet <- glmnet::auc(label.num, guess)
+  }, PRROC1={
+    auc.list$PRROC1 <- roc.curve(
+      df.list$spam$guess, df.list$email$guess, curve=FALSE)$auc
+  }, PRROC2={
+    auc.list$PRROC2 <- roc.curve(
+      guess, weights.class0=label.num, curve=FALSE)$auc
+  }, WeightedROC={
+    wroc <- WeightedROC(guess, set$label)
+    auc.list$WeightedROC <- WeightedAUC(wroc)
+  }, ROCR={
+    pred <- prediction(guess, set$label)
+    auc.list$ROCR <- performance(pred, "auc")@y.values[[1]]
+  }, pROC={
+    proc <- roc(set$label, guess, algorithm=2)
+    auc.list$pROC <- as.numeric(proc$auc)
+  }, times=10)
+  print(auc.time.df)
+}else{
+  auc.list$PRROC <- roc.curve(df.list$spam$guess, df.list$email$guess)$auc
+  auc.list$WeightedROC <- WeightedAUC(wroc)
+  auc.list$ROCR <- performance(pred, "auc")@y.values[[1]]
+  auc.list$pROC <- as.numeric(proc$auc)
+  auc.list$glmnet <- glmnet::auc(label.num, guess)
+}
+
+@ 
+
+The output above shows that glmnet is by far the fastest computation,
+and pROC is by far the slowest. The output below shows that the
+functions all compute the same AUC:
+
+<<test-auc-values>>=
+
+do.call(rbind, auc.list)
+
+@ 
+
+Tied scores are only problematic in glmnet::auc if weights are
+specified as the third argument, so in this case it works fine (tied
+scores but no weights specified).
 
 \end{document}
