@@ -13,7 +13,7 @@ integer/numeric with values all in {0=negative,1=positive} or
 
 \value{data.frame with true positive rate (TPR), false positive rate
 (FPR), weighted false positive count (FP), weighted false negative
-count (FN), and threshold (smallest guess classified as positive).}
+count (FN), and threshold (smallest \code{guess} classified as positive).}
 
 \author{Toby Dylan Hocking}
 

@@ -25,7 +25,7 @@
 
 The goal of this vignette is to compare how long it takes to compute
 the ROC curves and AUC using different R packages: WeightedROC, ROCR,
-pROC, glmnet.
+pROC.
 
 \section{Data}
 

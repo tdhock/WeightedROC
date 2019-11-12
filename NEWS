@@ -1,3 +1,7 @@
+2019.11.12 PR#6
+
+remove glmnet::auc from examples as it is no longer exported.
+
 2018.10.1 PR#3
 
 new tests compare with geometry and GsymPoint.
