@@ -3,6 +3,8 @@ Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
 Author: Toby Dylan Hocking
 Version: 2019.11.12
 License: GPL-3
+URL: https://github.com/tdhock/WeightedROC
+BugReports: https://github.com/tdhock/WeightedROC/issues
 Title: Fast, Weighted ROC Curves
 Description: Fast computation of
  Receiver Operating Characteristic (ROC) curves
