@@ -2,7 +2,8 @@
 \alias{WeightedROC}
 \title{WeightedROC}
 \description{Compute a weighted ROC curve.}
-\usage{WeightedROC(guess, label, weight = rep(1, length(label)))}
+\usage{WeightedROC(guess, label, 
+    weight = rep(1, length(label)))}
 \arguments{
   \item{guess}{Numeric vector of scores.}
   \item{label}{True positive/negative labels. A factor with 2 unique values, or

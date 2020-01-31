@@ -1,3 +1,9 @@
+2020.1.31
+
+remove Suggest ElemStatLearn.
+
+remove Speed vignette.
+
 2019.11.12 
 
 remove glmnet::auc from examples as it is no longer exported.
