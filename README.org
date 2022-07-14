@@ -45,8 +45,8 @@ example(WeightedAUC)
 | AUC         |      0.3.0 | 2013-09-30 |             354 | no      | no    | no     |
 | WeightedROC | 2017.08.12 | 2017-08-12 |             288 | *yes*   | *yes* | *yes*  |
 | glmnet::auc |      1.9-5 | 2013-08-01 |              22 | *yes*   | no    | *yes*  |
-| DescTools   |    TODO    |
-| bayestestR  |    TODO    |
+| DescTools::AUC   |    TODO    |
+| bayestestR::area_under_curve   |    TODO    |
 
 - *weights* shows which packages allow weights (non-uniform loss for each observation).
 - *tests* shows which R packages implement [[file:tests/testthat/test-auc.R][unit tests]] to check that the
