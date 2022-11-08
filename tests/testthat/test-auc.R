@@ -164,3 +164,17 @@ test_that("aSAH", {
   my.auc <- WeightedAUC(tp.fp)
   expect_equal(my.auc, as.numeric(proc$auc))
 })
+
+test_that("auc fun warns for incomplete curve", {
+  p <- function(FPR, TPR)data.frame(FPR, TPR)
+  incomplete.df <- rbind(p(0.5,1), p(0.5,0.5), p(0,0))
+  expect_warning({
+    incomplete.auc <- WeightedAUC(incomplete.df)
+  }, "ROC curve incomplete (missing FPR=1, TPR=1)", exact=TRUE)
+  expect_equal(incomplete.auc, 1/8)
+  complete.df <- rbind(p(1,1), incomplete.df)
+  expect_warning({
+    complete.auc <- WeightedAUC(complete.df)
+  }, NA)
+  expect_equal(complete.auc, 5/8)
+})
