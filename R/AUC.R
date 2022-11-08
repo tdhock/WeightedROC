@@ -10,6 +10,15 @@ WeightedAUC <- structure(function
     ## Ensure that the curve is sorted in decreasing order.
     stopifnot(diff(tpr.fpr[[var.name]]) <= 0)
   }
+  expected.df <- data.frame(value=1:0, i=c(1,nrow(tpr.fpr)))
+  for(expected.i in 1:nrow(expected.df)){
+    expected.row <- expected.df[expected.i,]
+    computed.row <- tpr.fpr[expected.row$i,]
+    bad <- function(XPR)computed.row[[XPR]] != expected.row$value
+    if(bad("FPR") || bad("TPR")){
+      warning(sprintf("ROC curve incomplete (expected FPR=TPR=%s in row %d, got FPR=%s, TPR=%s)", paste(expected.row$value), expected.row$i, paste(computed.row$FPR), paste(computed.row$TPR)))
+    }
+  }    
   right <- tpr.fpr[-nrow(tpr.fpr),]
   left <- tpr.fpr[-1,]
   width <- right$FPR - left$FPR

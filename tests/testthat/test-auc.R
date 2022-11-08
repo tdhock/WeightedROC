@@ -170,7 +170,7 @@ test_that("auc fun warns for incomplete curve", {
   incomplete.df <- rbind(p(0.5,1), p(0.5,0.5), p(0,0))
   expect_warning({
     incomplete.auc <- WeightedAUC(incomplete.df)
-  }, "ROC curve incomplete (missing FPR=1, TPR=1)", exact=TRUE)
+  }, "ROC curve incomplete (expected FPR=TPR=1 in row 1, got FPR=0.5, TPR=1)", fixed=TRUE)
   expect_equal(incomplete.auc, 1/8)
   complete.df <- rbind(p(1,1), incomplete.df)
   expect_warning({
