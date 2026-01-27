@@ -55,7 +55,7 @@ example(WeightedAUC)
   Note that WeightedROC has the simplest implementation other than glmnet::auc.
 - *cumsum* shows whether or not the cumsum function is used to compute
   the ROC curve. Using the cumsum function is simple to code and fast
-  -- see the [[https://cran.r-project.org/web/packages/WeightedROC/vignettes/Speed.pdf][Speed vignette]].
+  -- see the [[https://github.com/tdhock/WeightedROC/blob/7770c08c3828258ee9febdd8a62a036313d3bf26/vignettes/Speed.Rnw][Speed vignette]].
 
 ** When to use PRROC? 
 
