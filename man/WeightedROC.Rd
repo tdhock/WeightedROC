@@ -7,8 +7,8 @@
 \arguments{
   \item{guess}{Numeric vector of scores.}
   \item{label}{True positive/negative labels. A factor with 2 unique values, or
-integer/numeric with values all in {0=negative,1=positive} or
-{1=negative,2=positive} or {-1=negative,1=positive}.}
+integer/numeric with values all in (0=negative,1=positive) or
+(1=negative,2=positive) or (-1=negative,1=positive).}
   \item{weight}{Positive weights, by default 1.}
 }
 
@@ -16,7 +16,7 @@ integer/numeric with values all in {0=negative,1=positive} or
 (FPR), weighted false positive count (FP), weighted false negative
 count (FN), and threshold (smallest \code{guess} classified as positive).}
 
-\author{Toby Dylan Hocking}
+\author{Toby Dylan Hocking <toby.hocking@r-project.org> [cre, aut] (ORCID: <https://orcid.org/0000-0002-3146-0865>)}
 
 
 

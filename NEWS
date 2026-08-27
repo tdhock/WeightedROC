@@ -1,62 +1,66 @@
-2020.1.31
+Changes in version 2026.8.27
 
-remove Suggest ElemStatLearn.
+- change {} to () in WeightedROC.Rd to avoid CRAN NOTE (Lost braces; missing escapes or markup?).
+- update format of NEWS and DESCRIPTION.
 
-remove Speed vignette.
+Changes in version 2020.1.31
 
-2019.11.12 
+- remove Suggest ElemStatLearn.
+- remove Speed vignette.
 
-remove glmnet::auc from examples as it is no longer exported.
+Changes in version 2019.11.12
 
-2018.10.1 PR#3
+- Author: 
+- remove glmnet::auc from examples as it is no longer exported.
 
-new tests compare with geometry and GsymPoint.
+Changes in version 2018.10.1
 
-simplify vignette/examples (remove AUC from Speed vignette).
+- Author: PR#3
+- new tests compare with geometry and GsymPoint.
+- simplify vignette/examples (remove AUC from Speed vignette).
+- always require rather than library the suggested packages.
 
-always require rather than library the suggested packages.
+Changes in version 2017.08.25
 
-2017.08.25
+- comparisons with PRROC.
 
-comparisons with PRROC.
+Changes in version 2017.07.24
 
-2017.07.24
+- if(require(microbenchmark)) in ROC example for CRAN.
 
-if(require(microbenchmark)) in ROC example for CRAN.
+Changes in version 2017.07.12
 
-2017.07.12
+- if(require(microbenchmark)) in examples for CRAN.
 
-if(require(microbenchmark)) in examples for CRAN.
+Changes in version 2017.07.11
 
-2017.07.11
+- if(require(microbenchmark)) in vignettes for CRAN.
 
-if(require(microbenchmark)) in vignettes for CRAN.
+Changes in version 2017.06.08
 
-2017.06.08 PR#5
+- Author: PR#5
+- data(foo, envir=environment()) to pass CRAN checks.
 
-data(foo, envir=environment()) to pass CRAN checks.
+Changes in version 2016.11.09
 
-2016.11.09 PR#4
+- Author: PR#4
+- WeightedROC stops with an error when guess has NA values.
 
-WeightedROC stops with an error when guess has NA values.
+Changes in version 2016.03.22
 
-2016.03.22 PR#2
+- Author: PR#2
+- WeightedROC stops with an error when there is only one value of label.
 
-WeightedROC stops with an error when there is only one value of label.
+Changes in version 2015.10.02
 
-2015.10.02
+- WeightedROC returns threshold, FP, FN.
 
-WeightedROC returns threshold, FP, FN.
+Changes in version 2014.7.10
 
-2014.7.10
+- Compare with glmnet::auc.
+- Speed vignette.
 
-Compare with glmnet::auc.
+Changes in version 2014.7.7
 
-Speed vignette.
-
-2014.7.7
-
-First version with examples and tests copied from ChIP-seq data
-analysis project.
-
-Compare with pROC and ROCR packages.
+- First version with examples and tests copied from ChIP-seq data analysis project.
+- Compare with pROC and ROCR packages.

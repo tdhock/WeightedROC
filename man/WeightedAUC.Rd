@@ -10,7 +10,7 @@
 
 \value{Numeric scalar.}
 
-\author{Toby Dylan Hocking}
+\author{Toby Dylan Hocking <toby.hocking@r-project.org> [cre, aut] (ORCID: <https://orcid.org/0000-0002-3146-0865>)}
 
 
 

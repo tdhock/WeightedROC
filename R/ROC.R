@@ -4,8 +4,8 @@ WeightedROC <- structure(function
 ### Numeric vector of scores.
  label,
 ### True positive/negative labels. A factor with 2 unique values, or
-### integer/numeric with values all in {0=negative,1=positive} or
-### {1=negative,2=positive} or {-1=negative,1=positive}.
+### integer/numeric with values all in (0=negative,1=positive) or
+### (1=negative,2=positive) or (-1=negative,1=positive).
  weight=rep(1, length(label))
 ### Positive weights, by default 1.
  ){
